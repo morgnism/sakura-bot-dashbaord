@@ -1,6 +1,7 @@
 import { PartialDiscordGuild } from 'remix-auth-socials/build/strategies/discord';
 import { PartialGuildChannel } from '~/type';
-import { DISCORD_BASE_URL, DISCORD_TOKEN } from './constants';
+import { DISCORD_TOKEN } from './config';
+import { DISCORD_BASE_URL } from './constants';
 
 export const fetcher = async <T>(
   uri: string,

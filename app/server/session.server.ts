@@ -1,7 +1,7 @@
 import { createCookieSessionStorage } from '@remix-run/node';
-import { AUTH_SECRET, IS_PRODUCTION } from '~/lib/constants';
+import { AUTH_SECRET, IS_PRODUCTION } from '~/lib/config';
 
-export let sessionStorage = createCookieSessionStorage({
+export const sessionStorage = createCookieSessionStorage({
   cookie: {
     name: '_session',
     sameSite: 'lax',
@@ -12,4 +12,4 @@ export let sessionStorage = createCookieSessionStorage({
   },
 });
 
-export let { getSession, commitSession, destroySession } = sessionStorage;
+export const { getSession, commitSession, destroySession } = sessionStorage;
