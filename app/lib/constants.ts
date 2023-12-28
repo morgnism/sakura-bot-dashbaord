@@ -6,7 +6,7 @@ export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 const API_VERSION = '10';
 
-export const DISCORD_BASE_URL = `https://discord.com/api/${API_VERSION}`;
+export const DISCORD_BASE_URL = `https://discord.com/api/v${API_VERSION}`;
 
 export const enum AppRoutes {
   AUTH = '/auth',

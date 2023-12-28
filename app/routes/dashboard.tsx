@@ -21,6 +21,11 @@ export default function Dashboard() {
       <Form action="/logout" method="post">
         <button>Logout</button>
       </Form>
+      <ul>
+        {user.guilds.map(({ id, name }) => (
+          <li key={id}>{name}</li>
+        ))}
+      </ul>
     </div>
   );
 }
