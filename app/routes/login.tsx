@@ -13,13 +13,11 @@ const SocialButton: React.FC<SocialButtonProps> = ({ provider, label }) => (
   </Form>
 );
 
-export default function Login() {
+export default function LoginPage() {
   return (
-    <>
-      <SocialButton
-        provider={SocialsProvider.DISCORD}
-        label="Login with Discord"
-      />
-    </>
+    <SocialButton
+      provider={SocialsProvider.DISCORD}
+      label="Sign In With Discord"
+    />
   );
 }
