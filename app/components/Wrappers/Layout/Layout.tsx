@@ -4,8 +4,11 @@ import Navbar from '~/components/Navbar';
 const Layout = ({ children }: PropsWithChildren) => {
   return (
     <>
-      <Navbar />
-      {children}
+      {/* Alert banner */}
+      <main>
+        <Navbar />
+        {children}
+      </main>
     </>
   );
 };
