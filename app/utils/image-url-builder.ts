@@ -12,6 +12,7 @@ export type ExtensionTypeNames = keyof typeof ExtensionNames;
 export const enum CDNTypes {
   'emoji',
   'avatars',
+  'icons',
 }
 
 export type CDNTypeNames = keyof typeof CDNTypes;
@@ -43,5 +44,7 @@ export const imageUrlBuilder = (
     return undefined;
   }
 
-  return `${DISCORD_BASE_CDN_URL}/${resource}/${id}/${imageHash}.${ext}`;
+  const resourceType = `/${resource}` || '';
+
+  return `${DISCORD_BASE_CDN_URL}${resourceType}/${id}/${imageHash}.${ext}`;
 };
