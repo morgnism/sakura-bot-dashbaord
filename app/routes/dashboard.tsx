@@ -3,16 +3,14 @@ import { Form, useLoaderData } from '@remix-run/react';
 import { AppRoutes } from '~/lib/constants';
 import { authenticator } from '~/server/auth.server';
 
-export let loader = async ({ request }: LoaderFunctionArgs) => {
-  const user = await authenticator.isAuthenticated(request, {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  return await authenticator.isAuthenticated(request, {
     failureRedirect: AppRoutes.LOGOUT,
   });
-
-  return { user };
 };
 
 export default function Dashboard() {
-  const { user } = useLoaderData<typeof loader>();
+  const user = useLoaderData<typeof loader>();
 
   return (
     <div>
