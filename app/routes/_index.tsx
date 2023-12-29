@@ -10,9 +10,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const user = await authenticator.isAuthenticated(request);
-
-  return user;
+  return await authenticator.isAuthenticated(request);
 };
 
 export default function HomePage() {
