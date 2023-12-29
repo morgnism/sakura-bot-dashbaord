@@ -5,6 +5,7 @@ import Document from './components/Wrappers/Document';
 import Layout from './components/Wrappers/Layout';
 import styles from './global.css';
 import { authenticator } from './server/auth.server';
+import Navbar from './components/Navbar';
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref
@@ -19,6 +20,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function App() {
   return (
     <Document title="My Remix App">
+      {/* Alert banner */}
+      <Navbar />
       <Layout>
         <Outlet />
       </Layout>

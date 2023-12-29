@@ -21,7 +21,7 @@ const Document = ({
         <Links />
         {title ? <title>{title}</title> : null}
       </head>
-      <body className="flex min-h-screen flex-col bg-slate-900 text-white">
+      <body className="bg-slate-900 text-white">
         {children}
 
         <ScrollRestoration />
