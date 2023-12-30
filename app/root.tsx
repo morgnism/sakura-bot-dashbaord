@@ -7,9 +7,8 @@ import styles from './global.css';
 import { authenticator } from './server/auth.server';
 
 export const links: LinksFunction = () => [
-  ...(cssBundleHref
-    ? [{ rel: 'stylesheet', href: cssBundleHref }]
-    : [{ rel: 'stylesheet', href: styles }]),
+  { rel: 'stylesheet', href: styles },
+  ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
