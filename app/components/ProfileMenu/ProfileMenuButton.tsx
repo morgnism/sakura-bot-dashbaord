@@ -1,12 +1,12 @@
 import { Form } from '@remix-run/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SocialsProvider } from 'remix-auth-socials';
 import useOutsideClick from '~/hooks/useClickOutside';
+import { useGetUser } from '~/hooks/useGetUser';
 import { AppRoutes } from '~/lib/constants';
-import Button from '../Button';
+import DiscordSignInButton from '../Buttons/DiscordSignInButton';
 import ProfileFlyoutMenu from './ProfileFlyoutMenu';
 import ProfileFlyoutMenuControl from './ProfileFlyoutMenuControl';
-import { useGetUser } from '~/hooks/useGetUser';
 
 interface SocialButtonProps {
   provider: SocialsProvider;
@@ -15,12 +15,12 @@ interface SocialButtonProps {
 
 const SocialButton: React.FC<SocialButtonProps> = ({ provider, label }) => (
   <Form action={`${AppRoutes.AUTH}/${provider}`} method="post">
-    <Button
+    <DiscordSignInButton
       className="rounded-md bg-[#4f46e5] text-sm font-semibold text-white shadow-sm hover:bg-[hsl(239,84%,67%)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4f46e5]"
       type="submit"
     >
       {label}
-    </Button>
+    </DiscordSignInButton>
   </Form>
 );
 
@@ -32,16 +32,21 @@ const ProfileMenuButton = () => {
     setOpen(false);
   });
 
-  console.log(isOpen);
+  useEffect(() => {
+    console.log(isOpen);
+  }, [isOpen]);
 
   return (
-    <div className="flex items-center">
+    <>
       {user ? (
         <div className="relative z-10 ">
           <ProfileFlyoutMenuControl
             isMenuOpen={isOpen}
             user={user}
-            openMenu={() => setOpen(true)}
+            openMenu={() => {
+              console.log('open clicked');
+              setOpen(true);
+            }}
           />
           {isOpen && (
             <ProfileFlyoutMenu
@@ -56,7 +61,7 @@ const ProfileMenuButton = () => {
           label="Sign In With Discord"
         />
       )}
-    </div>
+    </>
   );
 };
 
