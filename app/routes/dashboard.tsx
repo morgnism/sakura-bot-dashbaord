@@ -1,10 +1,10 @@
 import { Outlet } from '@remix-run/react';
-import RouteWrapper from '~/components/Wrappers/RouteWrapper';
+import RouteLayout from '~/components/Wrappers/RouteLayout';
 
 export default function DashboardLayout() {
   return (
-    <RouteWrapper>
+    <RouteLayout>
       <Outlet />
-    </RouteWrapper>
+    </RouteLayout>
   );
 }
