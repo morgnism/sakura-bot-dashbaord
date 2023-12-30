@@ -1,5 +1,6 @@
 import { Form, Link } from '@remix-run/react';
 import { RefObject } from 'react';
+import Button from '../Button';
 
 type ProfileFlyoutMenuProps = {
   menuRef: RefObject<HTMLDivElement>;
@@ -24,7 +25,7 @@ const ProfileFlyoutMenu = ({ menuRef, closeMenu }: ProfileFlyoutMenuProps) => (
     </div>
     <Form action="/logout" method="post">
       <div className="relative cursor-pointer whitespace-nowrap rounded-lg bg-transparent px-3 py-2.5 text-sm text-[#9195ab] transition-all hover:bg-[#1f2129]">
-        <button onClick={closeMenu}>Logout</button>
+        <Button onClick={closeMenu}>Logout</Button>
       </div>
     </Form>
   </div>

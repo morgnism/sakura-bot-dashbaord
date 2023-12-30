@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import { DiscordUser } from '~/type';
 import { imageUrlBuilder } from '~/utils/image-url-builder';
+import Button from '../Button';
 
 type ProfileFlyoutMenuControl = {
   id?: string;
@@ -13,7 +14,11 @@ const ProfileFlyoutMenuControl = ({
   user,
   openMenu,
 }: ProfileFlyoutMenuControl) => (
-  <button className="flex cursor-pointer items-center py-1" onClick={openMenu}>
+  <Button
+    type="button"
+    className="flex cursor-pointer items-center py-1"
+    onClick={openMenu}
+  >
     <img
       src={imageUrlBuilder(user.id, user.avatar, { resource: 'avatars' })}
       alt={user.displayName}
@@ -40,7 +45,7 @@ const ProfileFlyoutMenuControl = ({
         strokeLinejoin="round"
       ></path>
     </svg>
-  </button>
+  </Button>
 );
 
 export default ProfileFlyoutMenuControl;

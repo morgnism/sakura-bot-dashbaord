@@ -1,5 +1,6 @@
 import { Form } from '@remix-run/react';
 import { SocialsProvider } from 'remix-auth-socials';
+import Button from '~/components/Button';
 import { AppRoutes } from '~/lib/constants';
 
 interface SocialButtonProps {
@@ -9,7 +10,7 @@ interface SocialButtonProps {
 
 const SocialButton: React.FC<SocialButtonProps> = ({ provider, label }) => (
   <Form action={`${AppRoutes.AUTH}/${provider}`} method="post">
-    <button>{label}</button>
+    <Button>{label}</Button>
   </Form>
 );
 
