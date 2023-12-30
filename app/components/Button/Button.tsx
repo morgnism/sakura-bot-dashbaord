@@ -3,7 +3,7 @@ import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 
 export type ButtonProps = {
   isDisabled?: boolean;
-  className: string;
+  className?: string;
   onClick?: () => void;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
