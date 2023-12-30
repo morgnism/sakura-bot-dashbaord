@@ -2,16 +2,16 @@ import { Form } from '@remix-run/react';
 import { useState } from 'react';
 import { SocialsProvider } from 'remix-auth-socials';
 import useOutsideClick from '~/hooks/useClickOutside';
-import { useUser } from '~/hooks/useUser';
+import { useOptionalUser } from '~/hooks/useUser';
 import { AppRoutes } from '~/lib/constants';
 import DiscordSignInButton from '../Buttons/DiscordSignInButton';
 import ProfileFlyoutMenu from './ProfileFlyoutMenu';
 import ProfileFlyoutMenuControl from './ProfileFlyoutMenuControl';
 
-interface SocialButtonProps {
+type SocialButtonProps = {
   provider: SocialsProvider;
   label: string;
-}
+};
 
 const SocialButton: React.FC<SocialButtonProps> = ({ provider, label }) => (
   <Form action={`${AppRoutes.AUTH}/${provider}`} method="post">
@@ -26,7 +26,7 @@ const SocialButton: React.FC<SocialButtonProps> = ({ provider, label }) => (
 
 const ProfileMenuButton = () => {
   const [isOpen, setOpen] = useState(false);
-  const user = useUser();
+  const user = useOptionalUser();
 
   const menuRef = useOutsideClick(() => {
     setOpen(false);
