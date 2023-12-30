@@ -1,14 +1,11 @@
-import {
-  DiscordProfile,
-  PartialDiscordGuild,
-} from 'remix-auth-socials/build/strategies/discord';
+import { DiscordProfile, PartialDiscordGuild } from 'remix-auth-socials';
 
 export type DiscordUser = {
   id: DiscordProfile['id'];
   displayName: DiscordProfile['displayName'];
   avatar: DiscordProfile['__json']['avatar'];
   email: DiscordProfile['__json']['email'];
-  guilds: Array<PartialDiscordGuild>;
+  guilds: PartialDiscordGuild[];
   accessToken: string;
   refreshToken: string;
 };
