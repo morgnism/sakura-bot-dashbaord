@@ -25,7 +25,7 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: { error: any }) {
-  console.log(error);
+  console.log('ErrorBoundary', error);
   return (
     <Document>
       <MainLayout>
