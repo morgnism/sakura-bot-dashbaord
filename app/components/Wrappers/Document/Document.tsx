@@ -6,7 +6,6 @@ import {
   ScrollRestoration,
 } from '@remix-run/react';
 import { PropsWithChildren } from 'react';
-import { IS_DEVELOP } from '~/lib/config';
 
 const Document = ({
   children,
@@ -27,7 +26,7 @@ const Document = ({
         <ScrollRestoration />
         <Scripts />
         {/*Enable live reload in development environment only, not production */}
-        {IS_DEVELOP ? <LiveReload /> : null}
+        {process.env.NODE_ENV === 'development' ? <LiveReload /> : null}
       </body>
     </html>
   );
