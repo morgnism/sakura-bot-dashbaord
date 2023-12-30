@@ -1,8 +1,8 @@
 import { Form } from '@remix-run/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { SocialsProvider } from 'remix-auth-socials';
 import useOutsideClick from '~/hooks/useClickOutside';
-import { useGetUser } from '~/hooks/useGetUser';
+import { useUser } from '~/hooks/useUser';
 import { AppRoutes } from '~/lib/constants';
 import DiscordSignInButton from '../Buttons/DiscordSignInButton';
 import ProfileFlyoutMenu from './ProfileFlyoutMenu';
@@ -26,15 +26,11 @@ const SocialButton: React.FC<SocialButtonProps> = ({ provider, label }) => (
 
 const ProfileMenuButton = () => {
   const [isOpen, setOpen] = useState(false);
-  const user = useGetUser();
+  const user = useUser();
 
   const menuRef = useOutsideClick(() => {
     setOpen(false);
   });
-
-  useEffect(() => {
-    console.log(isOpen);
-  }, [isOpen]);
 
   return (
     <>
@@ -43,10 +39,7 @@ const ProfileMenuButton = () => {
           <ProfileFlyoutMenuControl
             isMenuOpen={isOpen}
             user={user}
-            openMenu={() => {
-              console.log('open clicked');
-              setOpen(true);
-            }}
+            openMenu={() => setOpen(true)}
           />
           {isOpen && (
             <ProfileFlyoutMenu
