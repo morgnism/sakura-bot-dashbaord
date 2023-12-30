@@ -2,10 +2,9 @@ import { cssBundleHref } from '@remix-run/css-bundle';
 import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
 import { Outlet } from '@remix-run/react';
 import Document from './components/Wrappers/Document';
-import Layout from './components/Wrappers/Layout';
+import MainLayout from './components/Wrappers/MainLayout';
 import styles from './global.css';
 import { authenticator } from './server/auth.server';
-import Navbar from './components/Navbar';
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref
@@ -21,10 +20,7 @@ export default function App() {
   return (
     <Document title="My Remix App">
       {/* Alert banner */}
-      <Navbar />
-      <Layout>
-        <Outlet />
-      </Layout>
+      <Outlet />
     </Document>
   );
 }
@@ -33,10 +29,10 @@ export function ErrorBoundary({ error }: { error: any }) {
   console.log(error);
   return (
     <Document>
-      <Layout>
+      <MainLayout>
         <h1>There was an Error</h1>
         <p>{error?.message}</p>
-      </Layout>
+      </MainLayout>
     </Document>
   );
 }
