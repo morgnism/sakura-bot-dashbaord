@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 
 export type ButtonProps = {
@@ -15,10 +14,7 @@ const Button = ({
   children,
 }: PropsWithChildren<ButtonProps>) => (
   <button
-    className={classNames([
-      'relative mx-auto flex w-full shrink-0 items-center gap-1.5 overflow-hidden rounded-lg px-4 py-2 text-base transition-all duration-200 active:bg-opacity-40 disabled:cursor-not-allowed disabled:opacity-50 md:mx-0 md:w-auto',
-      className,
-    ])}
+    className={className}
     disabled={isDisabled}
     onClick={onClick}
     type={type}
