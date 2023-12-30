@@ -7,7 +7,7 @@ import { imageUrlBuilder } from '~/utils/image-url-builder';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   return await authenticator.isAuthenticated(request, {
-    failureRedirect: AppRoutes.LOGOUT,
+    failureRedirect: AppRoutes.HOME,
   });
 };
 

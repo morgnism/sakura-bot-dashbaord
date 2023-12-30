@@ -7,6 +7,6 @@ export const loader = ({ request, params }: LoaderFunctionArgs) => {
   invariant(params.provider, 'Missing provider param');
   return authenticator.authenticate(params.provider, request, {
     successRedirect: AppRoutes.DASHBOARD,
-    failureRedirect: AppRoutes.LOGIN,
+    failureRedirect: AppRoutes.HOME,
   });
 };
