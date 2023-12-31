@@ -11,3 +11,12 @@ export const enum AppRoutes {
   LOGIN = '/login',
   DASHBOARD = '/dashboard',
 }
+
+export const RegisteredModules = {
+  welcomeConfig: true,
+  leaveConfig: true,
+  autoroleConfig: true,
+  moderationConfig: true,
+};
+
+export const RegisteredModuleKeys = Object.keys(RegisteredModules);
