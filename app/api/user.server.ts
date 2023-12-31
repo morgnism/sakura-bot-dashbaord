@@ -6,11 +6,11 @@ import db from './db.server';
 const seedData = (guilds: PartialDiscordGuild[]) =>
   guilds.reduce(
     (a: Prisma.GuildConfigCreateOrConnectWithoutUsersInput[], guild) => {
-      if (!guild || !guild.id) {
+      if (!guild) {
         return a;
       }
 
-      const id = Number(guild.id);
+      const id = BigInt(guild.id);
 
       const configInputs = Object.keys(RegisteredModules).reduce(
         (b: Omit<Prisma.GuildConfigCreateWithoutUsersInput, 'id'>, module) => ({
@@ -27,10 +27,7 @@ const seedData = (guilds: PartialDiscordGuild[]) =>
 
       const input: Prisma.GuildConfigCreateOrConnectWithoutUsersInput = {
         where: { id },
-        create: {
-          id,
-          ...configInputs,
-        },
+        create: { id, ...configInputs },
       };
 
       a.push(input);
@@ -48,6 +45,6 @@ export const createUser = async (
   return await db.discordUser.upsert({
     where: { id },
     create: { id, guilds: { connectOrCreate: guildInputs } },
-    update: {}, // don't update the record
+    update: { id, guilds: { connectOrCreate: guildInputs } },
   });
 };

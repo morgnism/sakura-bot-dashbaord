@@ -39,11 +39,7 @@ authenticator.use(
 
       try {
         const user = await createUser(id, guilds);
-        const logMsg =
-          new Date(user.createdAt) < new Date()
-            ? `Found User (${user.id})`
-            : `Created new User (${user.id})`;
-        console.log(logMsg);
+        console.log(`User (${user.id})`);
       } catch (error) {
         console.log(error);
         throw error;
