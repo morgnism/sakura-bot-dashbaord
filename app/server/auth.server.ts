@@ -1,6 +1,7 @@
 import { Authenticator } from 'remix-auth';
 import { DiscordStrategy, SocialsProvider } from 'remix-auth-socials';
 import { fetchUserGuilds } from '~/api/guilds.server';
+import { createUser } from '~/api/user.server';
 import { AUTH_URL } from '~/lib/config';
 import { DiscordUser } from '~/type';
 import { sessionStorage } from './session.server';
@@ -33,6 +34,20 @@ authenticator.use(
       // const botGuilds = await fetchBotGuilds();
       // const matcher = (guidId: string) => botGuilds.some((botGuild) => botGuild.id === guidId)
       // const mutualGuilds = userGuilds.map((guild) => matcher(guild.id));
+
+      const id = BigInt(profile.id);
+
+      try {
+        const user = await createUser(id, guilds);
+        const logMsg =
+          new Date(user.createdAt) < new Date()
+            ? `Found User (${user.id})`
+            : `Created new User (${user.id})`;
+        console.log(logMsg);
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
 
       return {
         id: profile.id,
