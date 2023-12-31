@@ -5,11 +5,11 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  // directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
 model DiscordUser {
-  id        String        @id @default(uuid())
+  id        BigInt        @id @unique
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   guilds    GuildConfig[]
@@ -18,38 +18,37 @@ model DiscordUser {
 }
 
 model GuildConfig {
-  id     Int     @id @unique
+  id     BigInt  @id @unique
   prefix String  @default("$")
   active Boolean @default(false)
 
   // server activity channel to write command logs to
-  systemChannelId        Int?
-  afkChannelId           Int?
-  rulesChannelId         Int?
-  publicUpdatesChannelId Int?
-  safetyAlertsChannelId  Int?
+  systemChannelId        BigInt?
+  afkChannelId           BigInt?
+  rulesChannelId         BigInt?
+  publicUpdatesChannelId BigInt?
+  safetyAlertsChannelId  BigInt?
 
   welcomeConfig    WelcomeConfig?
   leaveConfig      LeaveConfig?
   autoroleConfig   RoleConfig?
   moderatorsConfig ModerationConfig?
 
-  createAt DateTime    @default(now())
-  updateAt DateTime    @updatedAt
-  userId   String      @unique
-  user     DiscordUser @relation(fields: [userId], references: [id])
+  createAt DateTime      @default(now())
+  updateAt DateTime      @updatedAt
+  users    DiscordUser[]
 
   @@map("guildconfig")
 }
 
 model WelcomeConfig {
   enabled   Boolean     @default(false)
-  channelId Int?
+  channelId BigInt?
   dmEnabled Boolean     @default(false)
   message   String?
   createAt  DateTime    @default(now())
   updateAt  DateTime    @updatedAt
-  guildId   Int         @unique
+  guildId   BigInt      @unique
   guild     GuildConfig @relation(fields: [guildId], references: [id])
 
   @@map("welcomeconfig")
@@ -57,13 +56,13 @@ model WelcomeConfig {
 
 model LeaveConfig {
   enabled   Boolean  @default(false)
-  channelId Int?
+  channelId BigInt?
   dmEnabled Boolean  @default(false)
   message   String?
   createAt  DateTime @default(now())
   updateAt  DateTime @updatedAt
 
-  guildId Int         @unique
+  guildId BigInt      @unique
   guild   GuildConfig @relation(fields: [guildId], references: [id])
 
   @@map("leaveconfig")
@@ -73,7 +72,7 @@ model RoleConfig {
   enabled  Boolean     @default(false)
   createAt DateTime    @default(now())
   updateAt DateTime    @updatedAt
-  guildId  Int         @unique
+  guildId  BigInt      @unique
   guild    GuildConfig @relation(fields: [guildId], references: [id])
 
   @@map("roleconfig")
@@ -85,7 +84,7 @@ model ModerationConfig {
   includeReason       Boolean     @default(false)
   preserveBanMessages Boolean     @default(false)
   deleteModCommands   Boolean     @default(false)
-  logChannelId        Int?
+  logChannelId        BigInt?
   banMessage          String      @default("***{user} was banned***")
   unbanMessage        String      @default("***{user} was unbanned***")
   softbanMessage      String      @default("***{user} was soft banned***")
@@ -94,7 +93,7 @@ model ModerationConfig {
   unmuteMessage       String      @default("***{user} was unmuted***")
   createAt            DateTime    @default(now())
   updateAt            DateTime    @updatedAt
-  guildId             Int         @unique
+  guildId             BigInt      @unique
   guild               GuildConfig @relation(fields: [guildId], references: [id])
 }
 
@@ -110,10 +109,10 @@ enum RoleType {
 }
 
 model Roles {
-  id        Int        @id
-  guilId    Int
+  id        BigInt     @id
+  guilId    BigInt
   action    RoleAction @default(ADD)
-  delay     Int        @default(0)
+  delay     BigInt     @default(0)
   type      RoleType   @default(DEFAULT)
   protected Boolean    @default(false)
 
