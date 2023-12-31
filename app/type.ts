@@ -33,3 +33,20 @@ export type PartialGuildChannel = {
   rate_limit_per_user: string;
   banner?: string;
 };
+
+export type GuildConfigs = {
+  id: bigint;
+  active: boolean;
+  prefix: string;
+  afkChannelId: bigint | null;
+  publicUpdatesChannelId: bigint | null;
+  rulesChannelId: bigint | null;
+  safetyAlertsChannelId: bigint | null;
+  systemChannelId: bigint | null;
+  createAt: Date;
+  updateAt: Date;
+  autoroleConfig: { enabled: boolean };
+  leaveConfig: { enabled: boolean };
+  moderationConfig: { enabled: boolean };
+  welcomeConfig: { enabled: boolean };
+};

@@ -2,7 +2,7 @@ import type { GuildConfig, Prisma } from '@prisma/client';
 import { PartialDiscordGuild } from 'remix-auth-socials';
 import { fetchWithBot, fetchWithUser } from '~/lib/api';
 import { DISCORD_BASE_URL, RegisteredModules } from '~/lib/constants';
-import { PartialGuildChannel } from '~/type';
+import { GuildConfigs, PartialGuildChannel } from '~/type';
 import { bigintSerializer } from '~/utils/serializer-polyfill';
 import db from './db.server';
 export type { GuildConfig } from '@prisma/client';
@@ -43,5 +43,5 @@ export const getAllConfigs = async (serverId: string) => {
     include,
   });
   const serialize = JSON.stringify(configs, bigintSerializer);
-  return JSON.parse(serialize) as typeof configs;
+  return JSON.parse(serialize) as GuildConfigs;
 };
