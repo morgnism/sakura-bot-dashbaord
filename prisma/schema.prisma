@@ -10,8 +10,7 @@ datasource db {
 
 model DiscordUser {
   id        BigInt        @id @unique
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  createdAt DateTime      @default(now()) @map("created_at")
   guilds    GuildConfig[]
 
   @@map(name: "discordusers")
@@ -23,19 +22,19 @@ model GuildConfig {
   active Boolean @default(false)
 
   // server activity channel to write command logs to
-  systemChannelId        BigInt?
-  afkChannelId           BigInt?
-  rulesChannelId         BigInt?
-  publicUpdatesChannelId BigInt?
-  safetyAlertsChannelId  BigInt?
+  systemChannelId        BigInt? @map("system_channel_id")
+  afkChannelId           BigInt? @map("afk_channel_id")
+  rulesChannelId         BigInt? @map("rules_channel_id")
+  publicUpdatesChannelId BigInt? @map("public_updates_channel_id")
+  safetyAlertsChannelId  BigInt? @map("safety_alerts_channel_id")
 
   welcomeConfig    WelcomeConfig?
   leaveConfig      LeaveConfig?
   autoroleConfig   RoleConfig?
-  moderatorsConfig ModerationConfig?
+  moderationConfig ModerationConfig?
 
-  createAt DateTime      @default(now())
-  updateAt DateTime      @updatedAt
+  createAt DateTime      @default(now()) @map("created_at")
+  updateAt DateTime      @updatedAt @map("updated_at")
   users    DiscordUser[]
 
   @@map("guildconfig")
@@ -43,58 +42,61 @@ model GuildConfig {
 
 model WelcomeConfig {
   enabled   Boolean     @default(false)
-  channelId BigInt?
-  dmEnabled Boolean     @default(false)
+  channelId BigInt?     @map("channel_id")
+  dmEnabled Boolean     @default(false) @map("dm_enabled")
   message   String?
-  createAt  DateTime    @default(now())
-  updateAt  DateTime    @updatedAt
-  guildId   BigInt      @unique
+  createAt  DateTime    @default(now()) @map("created_at")
+  updateAt  DateTime    @updatedAt @map("updated_at")
+  guildId   BigInt      @unique @map("guild_id")
   guild     GuildConfig @relation(fields: [guildId], references: [id])
 
   @@map("welcomeconfig")
 }
 
 model LeaveConfig {
-  enabled   Boolean  @default(false)
+  enabled   Boolean     @default(false)
   channelId BigInt?
-  dmEnabled Boolean  @default(false)
+  dmEnabled Boolean     @default(false)
   message   String?
-  createAt  DateTime @default(now())
-  updateAt  DateTime @updatedAt
-
-  guildId BigInt      @unique
-  guild   GuildConfig @relation(fields: [guildId], references: [id])
+  createAt  DateTime    @default(now()) @map("created_at")
+  updateAt  DateTime    @updatedAt @map("updated_at")
+  guildId   BigInt      @unique @map("guild_id")
+  guild     GuildConfig @relation(fields: [guildId], references: [id])
 
   @@map("leaveconfig")
 }
 
 model RoleConfig {
   enabled  Boolean     @default(false)
-  createAt DateTime    @default(now())
-  updateAt DateTime    @updatedAt
-  guildId  BigInt      @unique
+  createAt DateTime    @default(now()) @map("created_at")
+  updateAt DateTime    @updatedAt @map("updated_at")
+  guildId  BigInt      @unique @map("guild_id")
   guild    GuildConfig @relation(fields: [guildId], references: [id])
+  roles    Roles[]
 
   @@map("roleconfig")
 }
 
 model ModerationConfig {
   enabled             Boolean     @default(false)
-  dmPunish            Boolean     @default(false)
-  includeReason       Boolean     @default(false)
-  preserveBanMessages Boolean     @default(false)
-  deleteModCommands   Boolean     @default(false)
-  logChannelId        BigInt?
-  banMessage          String      @default("***{user} was banned***")
-  unbanMessage        String      @default("***{user} was unbanned***")
-  softbanMessage      String      @default("***{user} was soft banned***")
-  kickMessage         String      @default("***{user} was kicked***")
-  muteMessage         String      @default("***{user} was mute***")
-  unmuteMessage       String      @default("***{user} was unmuted***")
-  createAt            DateTime    @default(now())
-  updateAt            DateTime    @updatedAt
-  guildId             BigInt      @unique
+  dmPunish            Boolean     @default(false) @map("dm_punish")
+  includeReason       Boolean     @default(false) @map("include_reason")
+  preserveBanMessages Boolean     @default(false) @map("preserve_ban_messages")
+  deleteModCommands   Boolean     @default(false) @map("delete_mod_commands")
+  logChannelId        BigInt?     @map("log_channel_id")
+  banMessage          String      @default("***{user} was banned***") @map("banMessage")
+  unbanMessage        String      @default("***{user} was unbanned***") @map("unban_message")
+  softbanMessage      String      @default("***{user} was soft banned***") @map("softban_message")
+  kickMessage         String      @default("***{user} was kicked***") @map("kick_message")
+  muteMessage         String      @default("***{user} was mute***") @map("mute_message")
+  unmuteMessage       String      @default("***{user} was unmuted***") @map("unmute_message")
+  createAt            DateTime    @default(now()) @map("created_at")
+  updateAt            DateTime    @updatedAt @map("updated_at")
+  guildId             BigInt      @unique @map("guild_id")
   guild               GuildConfig @relation(fields: [guildId], references: [id])
+  roles               Roles[]
+
+  @@map("moderationconfig")
 }
 
 enum RoleAction {
@@ -109,12 +111,15 @@ enum RoleType {
 }
 
 model Roles {
-  id        BigInt     @id
-  guilId    BigInt
-  action    RoleAction @default(ADD)
-  delay     BigInt     @default(0)
-  type      RoleType   @default(DEFAULT)
-  protected Boolean    @default(false)
+  id                      BigInt            @id
+  action                  RoleAction        @default(ADD)
+  delay                   BigInt            @default(0)
+  type                    RoleType          @default(DEFAULT)
+  protected               Boolean           @default(false)
+  roleConfigId            BigInt?           @map("role_config_id")
+  roleConfig              RoleConfig?       @relation(fields: [roleConfigId], references: [guildId])
+  moderationConfigGuildId BigInt?           @map("moderation_config_guild_id")
+  moderationConfig        ModerationConfig? @relation(fields: [moderationConfigGuildId], references: [guildId])
 
   @@map("roles")
 }
