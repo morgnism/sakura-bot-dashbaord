@@ -4,7 +4,7 @@ import { fetchWithBot, fetchWithUser } from '~/lib/api';
 import { DISCORD_BASE_URL } from '~/lib/constants';
 import { FeaturesKeys } from '~/lib/features';
 import { FeatureConfigs, GuildConfigs, PartialGuildChannel } from '~/type';
-import { bigintSerializer } from '~/utils/serializer-polyfill';
+import { bigintSerializer } from '~/utils/serializer';
 import db from './db.server';
 export type { GuildConfig } from '@prisma/client';
 
