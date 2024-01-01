@@ -45,8 +45,9 @@ export type GuildConfigs = {
   systemChannelId: bigint | null;
   createAt: Date;
   updateAt: Date;
-  autoroleConfig: { enabled: boolean };
-  leaveConfig: { enabled: boolean };
-  moderationConfig: { enabled: boolean };
-  welcomeConfig: { enabled: boolean };
+};
+
+export type FeatureConfigs = {
+  name: string;
+  enabled: boolean;
 };
