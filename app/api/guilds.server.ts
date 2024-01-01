@@ -70,3 +70,22 @@ export const getFeatures = async (
   }
   return configs;
 };
+
+export const updateFeature = async (
+  serverId: string,
+  updates: {
+    name: string;
+    enabled: boolean;
+  }
+) => {
+  const guildId: GuildConfig['id'] = BigInt(serverId);
+  const { name, ...rest } = updates;
+  const config = await db.guildConfig.update({
+    where: { id: guildId },
+    select: { [name]: true },
+    data: { [name]: { update: { ...rest } } },
+  });
+
+  const serialize = JSON.stringify(config, bigintSerializer);
+  return JSON.parse(serialize) as GuildConfigs;
+};
