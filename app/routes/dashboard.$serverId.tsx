@@ -1,42 +1,12 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
 import { NavLink, Outlet } from '@remix-run/react';
-import invariant from 'tiny-invariant';
-import { getAllConfigs } from '~/api/guilds.server';
 import Logo from '~/components/Logo';
 import Navbar from '~/components/Navbar';
 import RouteLayout from '~/components/Wrappers/RouteLayout';
-import {
-  AvailableFeatures,
-  FeatureTypes,
-  Features,
-  MAIN_SIDEBAR_MENU,
-} from '~/lib/constants';
-import { GuildConfigs } from '~/type';
-
-export const initFeatures = (allSettings: GuildConfigs) => {
-  // map config settings
-  Object.entries(allSettings).map(([key, value]) => {
-    const feature = AvailableFeatures.get(key);
-    if (feature) {
-      const isEnabled = (value as { enabled: boolean }).enabled;
-      AvailableFeatures.set(key, {
-        ...feature,
-        isEnabled,
-      });
-    }
-  });
-};
-
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  invariant(params.serverId, 'Missing serverId param');
-  const allSettings = await getAllConfigs(params.serverId);
-  initFeatures(allSettings);
-  return allSettings;
-};
+import { FeatureTypes, Features, MAIN_SIDEBAR_MENU } from '~/lib/constants';
 
 export default function DashboardServerLayout() {
   const SERVER_MANAGEMENT_SIDEBAR_MENU = Features.filter(
-    (module) => module.type === FeatureTypes.SERVER_MANAGEMENT
+    ([_, feature]) => feature.type === FeatureTypes.SERVER_MANAGEMENT
   );
 
   return (
@@ -89,37 +59,39 @@ export default function DashboardServerLayout() {
                   Server Management
                 </div>
                 <ul role="list" className="-m-2 mt-2">
-                  {SERVER_MANAGEMENT_SIDEBAR_MENU.map(({ label, to }, i) => (
-                    <li key={i}>
-                      <NavLink
-                        to={to}
-                        className={({ isActive, isPending }) =>
-                          isActive
-                            ? 'bg-[#1f2937] text-white bqg flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                            : isPending
-                            ? ''
-                            : 'hover:bg-[#1f2937] text-[#9ca3af] hover:text-white bqg flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                        }
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          aria-hidden="true"
-                          className="text-[#9ca3af] hover:text-white h-6 w-6 shrink-0"
+                  {SERVER_MANAGEMENT_SIDEBAR_MENU.map(
+                    ([key, { label, to }]) => (
+                      <li key={key}>
+                        <NavLink
+                          to={to}
+                          className={({ isActive, isPending }) =>
+                            isActive
+                              ? 'bg-[#1f2937] text-white bqg flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
+                              : isPending
+                              ? ''
+                              : 'hover:bg-[#1f2937] text-[#9ca3af] hover:text-white bqg flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
+                          }
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
-                          ></path>
-                        </svg>
-                        {label}
-                      </NavLink>
-                    </li>
-                  ))}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                            className="text-[#9ca3af] hover:text-white h-6 w-6 shrink-0"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+                            ></path>
+                          </svg>
+                          {label}
+                        </NavLink>
+                      </li>
+                    )
+                  )}
                 </ul>
               </li>
             </ul>
