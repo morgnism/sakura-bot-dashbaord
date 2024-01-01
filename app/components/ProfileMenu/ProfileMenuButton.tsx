@@ -4,7 +4,7 @@ import { SocialsProvider } from 'remix-auth-socials';
 import useOutsideClick from '~/hooks/useClickOutside';
 import { useOptionalUser } from '~/hooks/useUser';
 import { AppRoutes } from '~/lib/constants';
-import DiscordSignInButton from '../Buttons/DiscordSignInButton';
+import DiscordSignInButton from './DiscordSignInButton';
 import ProfileFlyoutMenu from './ProfileFlyoutMenu';
 import ProfileFlyoutMenuControl from './ProfileFlyoutMenuControl';
 
