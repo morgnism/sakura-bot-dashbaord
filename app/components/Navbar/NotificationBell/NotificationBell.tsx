@@ -1,4 +1,4 @@
-import Button from '~/components/Button';
+import { Button } from '~/components/ui/button';
 
 type NotificationBellProps = {
   onClick: () => void;
@@ -7,7 +7,7 @@ type NotificationBellProps = {
 const NotificationBell = ({ onClick }: NotificationBellProps) => (
   <Button
     type="button"
-    className="text-[#9ca3af] hover:text-[#6b7280]"
+    className="text-[#9ca3af] hover:text-[#6b7280] p-0"
     onClick={onClick}
   >
     <span className="sr-only">View notifications</span>

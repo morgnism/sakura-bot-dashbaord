@@ -1,12 +1,10 @@
-import { PropsWithChildren } from 'react';
-import Button from '~/components/Button';
-import { ButtonProps } from '~/components/Button/Button';
+import { Button } from '../ui/button';
 
-const DiscordSignInButton = ({
-  children,
-  ...props
-}: PropsWithChildren<ButtonProps>) => (
-  <Button {...props}>
+const DiscordSignInButton = () => (
+  <Button
+    type="submit"
+    className="rounded-md bg-[#4f46e5] text-sm font-semibold text-white shadow-sm hover:bg-[hsl(239,84%,67%)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4f46e5] relative mx-auto flex w-full shrink-0 items-center gap-1.5 overflow-hidden px-4 py-2 transition-all duration-200 active:bg-opacity-40 disabled:cursor-not-allowed disabled:opacity-50 md:mx-0 md:w-auto"
+  >
     <div className="flex max-w-full grow justify-center">
       <span className="block w-full shrink-0 overflow-hidden text-ellipsis whitespace-nowrap text-center transition-all duration-200">
         <div className="flex items-center justify-center gap-2">
@@ -23,7 +21,7 @@ const DiscordSignInButton = ({
               fill="currentColor"
             ></path>
           </svg>
-          {children}
+          Sign In With Discord
         </div>
       </span>
     </div>

@@ -1,5 +1,5 @@
 import { useFetcher } from '@remix-run/react';
-import Button from '~/components/Button';
+import { Button } from '~/components/ui/button';
 import { cn } from '~/utils/cn';
 
 type ToggleSwitchProps = {

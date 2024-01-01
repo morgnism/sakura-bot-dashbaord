@@ -1,11 +1,15 @@
-import Button from '../Button';
+import { Button } from '../ui/button';
 
 type MobileButtonProps = {
   onClick: () => void;
 };
 
 const MobileButton = ({ onClick }: MobileButtonProps) => (
-  <Button type="button" className="text-[#4f46e5] lg:hidden" onClick={onClick}>
+  <Button
+    type="button"
+    className="text-[#4f46e5] lg:hidden p-0"
+    onClick={onClick}
+  >
     <span className="sr-only">Open sidebar</span>
     <svg
       xmlns="http://www.w3.org/2000/svg"
