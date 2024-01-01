@@ -1,19 +1,9 @@
+import { AppRoutes } from './route';
+
 const API_VERSION = '10';
 
 export const DISCORD_BASE_URL = `https://discord.com/api/v${API_VERSION}`;
 export const DISCORD_BASE_CDN_URL = 'https://cdn.discordapp.com';
-
-export const enum AppRoutes {
-  HOME = '/',
-  AUTH = '/auth',
-  LOGIN = '/login',
-  DASHBOARD = '/dashboard',
-  WELCOME = '/welcome',
-  LEAVE = '/leave',
-  AUTO_ROLES = '/auto_roles',
-  MODERATOR = '/moderator',
-  SETTINGS = '/settings',
-}
 
 export const FeaturesKeys = {
   WELCOME: 'welcomeConfig',

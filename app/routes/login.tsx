@@ -1,7 +1,7 @@
 import { Form } from '@remix-run/react';
 import { SocialsProvider } from 'remix-auth-socials';
 import Button from '~/components/Button';
-import { AppRoutes } from '~/lib/constants';
+import { AppRoutes } from '~/lib/route';
 
 type SocialButtonProps = {
   provider: SocialsProvider;

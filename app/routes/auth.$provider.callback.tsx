@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
 import invariant from 'tiny-invariant';
-import { AppRoutes } from '~/lib/constants';
+import { AppRoutes } from '~/lib/route';
 import { authenticator } from '~/server/auth.server';
 
 export const loader = ({ request, params }: LoaderFunctionArgs) => {

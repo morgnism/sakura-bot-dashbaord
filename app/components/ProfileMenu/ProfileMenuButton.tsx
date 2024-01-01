@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { SocialsProvider } from 'remix-auth-socials';
 import useOutsideClick from '~/hooks/useClickOutside';
 import { useOptionalUser } from '~/hooks/useUser';
-import { AppRoutes } from '~/lib/constants';
+import { AppRoutes } from '~/lib/route';
 import DiscordSignInButton from './DiscordSignInButton';
 import ProfileFlyoutMenu from './ProfileFlyoutMenu';
 import ProfileFlyoutMenuControl from './ProfileFlyoutMenuControl';
