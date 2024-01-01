@@ -16,12 +16,12 @@ const Navbar = () => {
       className={cn(
         'flex items-center justify-between gap-6 h-16 lg:px-8',
         isDashboardPath
-          ? 'bg-[#111827] border-b border-[#e5e7eb] shadow'
+          ? 'bg-[#111827] border-b border-[#e5e7eb] shadow px-4 md:px-6'
           : 'max-w-7xl mx-auto'
       )}
       aria-label="global"
     >
-      <div className="flex items-center gap-8 lg:gap-12">
+      <div className="flex items-center gap-6 lg:gap-12">
         {isDashboardPath ? (
           <>
             <MobileButton onClick={() => {}} />
