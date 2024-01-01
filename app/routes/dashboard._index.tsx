@@ -6,8 +6,10 @@ import { authenticator } from '~/server/auth.server';
 import { imageUrlBuilder } from '~/utils/image-url-builder';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const returnTo = new URL(request.url).pathname;
+  const searchParams = new URLSearchParams([['returnTo', returnTo]]);
   return await authenticator.isAuthenticated(request, {
-    failureRedirect: AppRoutes.HOME,
+    failureRedirect: `${AppRoutes.LOGIN}?${searchParams}`,
   });
 };
 
