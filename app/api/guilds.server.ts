@@ -2,7 +2,7 @@ import type { GuildConfig, Prisma } from '@prisma/client';
 import { PartialDiscordGuild } from 'remix-auth-socials';
 import { fetchWithBot, fetchWithUser } from '~/lib/api';
 import { DISCORD_BASE_URL } from '~/lib/constants';
-import { FeaturesKeys } from '~/lib/features';
+import { FeatureKeys } from '~/lib/features';
 import { FeatureConfigs, GuildConfigs, PartialGuildChannel } from '~/type';
 import { bigintSerializer } from '~/utils/serializer';
 import db from './db.server';
@@ -31,7 +31,7 @@ export const fetchGuildChannels = async (
 // Gets all the configs for a guild with their enabled status
 export const getAllConfigs = async (serverId: string) => {
   const guildId: GuildConfig['id'] = BigInt(serverId);
-  const include = Object.values(FeaturesKeys).reduce(
+  const include = Object.values(FeatureKeys).reduce(
     (b: Omit<Prisma.GuildConfigInclude, 'id'>, module) => ({
       ...b,
       [module]: { where: { guildId }, select: { enabled: true } },

@@ -1,6 +1,6 @@
 import { AppRoutes } from './route';
 
-export const FeaturesKeys = {
+export const FeatureKeys = {
   WELCOME: 'welcomeConfig',
   LEAVE: 'leaveConfig',
   AUTOROLE: 'autoroleConfig',
@@ -23,7 +23,7 @@ export class Feature {
 
 export const FeatureMap = new Map<string, Feature>([
   [
-    FeaturesKeys.WELCOME,
+    FeatureKeys.WELCOME,
     {
       to: `.${AppRoutes.WELCOME}`,
       label: 'Welcome',
@@ -33,7 +33,7 @@ export const FeatureMap = new Map<string, Feature>([
     },
   ],
   [
-    FeaturesKeys.LEAVE,
+    FeatureKeys.LEAVE,
     {
       to: `.${AppRoutes.LEAVE}`,
       label: 'Goodbye',
@@ -43,7 +43,7 @@ export const FeatureMap = new Map<string, Feature>([
     },
   ],
   [
-    FeaturesKeys.AUTOROLE,
+    FeatureKeys.AUTOROLE,
     {
       to: `.${AppRoutes.AUTO_ROLES}`,
       label: 'Auto Roles',
@@ -53,7 +53,7 @@ export const FeatureMap = new Map<string, Feature>([
     },
   ],
   [
-    FeaturesKeys.MODERATION,
+    FeatureKeys.MODERATION,
     {
       to: `.${AppRoutes.MODERATOR}`,
       label: 'Moderator',
