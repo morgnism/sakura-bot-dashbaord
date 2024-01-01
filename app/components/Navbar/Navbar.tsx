@@ -14,8 +14,10 @@ const Navbar = () => {
   return (
     <nav
       className={classNames([
-        'mx-auto flex max-w-7xl items-center justify-between gap-6 h-16 lg:px-8',
-        isDashboardPath ? 'bg-[#111827] border-b border-[#e5e7eb] shadow' : '',
+        'flex items-center justify-between gap-6 h-16 lg:px-8',
+        isDashboardPath
+          ? 'bg-[#111827] border-b border-[#e5e7eb] shadow'
+          : 'max-w-7xl mx-auto',
       ])}
       aria-label="global"
     >
