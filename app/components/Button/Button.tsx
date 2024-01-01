@@ -9,15 +9,17 @@ export type ButtonProps = {
 const Button = ({
   isDisabled = false,
   className,
-  type = 'button',
+  type,
   onClick,
   children,
+  ...props
 }: PropsWithChildren<ButtonProps>) => (
   <button
     className={className}
     disabled={isDisabled}
     onClick={onClick}
     type={type}
+    {...props}
   >
     {children}
   </button>
