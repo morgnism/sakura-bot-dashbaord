@@ -6,10 +6,7 @@ const DiscordSignInButton = ({
   children,
   ...props
 }: PropsWithChildren<ButtonProps>) => (
-  <Button
-    {...props}
-    className="relative mx-auto flex w-full shrink-0 items-center gap-1.5 overflow-hidden rounded-lg px-4 py-2 text-base transition-all duration-200 active:bg-opacity-40 disabled:cursor-not-allowed disabled:opacity-50 md:mx-0 md:w-auto"
-  >
+  <Button {...props}>
     <div className="flex max-w-full grow justify-center">
       <span className="block w-full shrink-0 overflow-hidden text-ellipsis whitespace-nowrap text-center transition-all duration-200">
         <div className="flex items-center justify-center gap-2">
