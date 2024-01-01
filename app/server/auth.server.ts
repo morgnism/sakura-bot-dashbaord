@@ -39,7 +39,7 @@ authenticator.use(
 
       try {
         const user = await createUser(id, guilds);
-        console.log(`User (${user.id})`);
+        console.log(`Logged in as User (${user.id})`);
       } catch (error) {
         console.log(error);
         throw error;
