@@ -3,7 +3,7 @@ import { useLoaderData } from '@remix-run/react';
 import invariant from 'tiny-invariant';
 import { getFeatures, updateFeature } from '~/api/guilds.server';
 import ToggleCard from '~/components/ToggleCard';
-import { Feature, FeatureMap } from '~/lib/constants';
+import { Feature, FeatureMap } from '~/lib/features';
 import { FeatureConfigs } from '~/type';
 
 const mapEnabledFeatures = (configs: FeatureConfigs[]) =>

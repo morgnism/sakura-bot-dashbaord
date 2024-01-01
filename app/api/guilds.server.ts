@@ -1,7 +1,8 @@
 import type { GuildConfig, Prisma } from '@prisma/client';
 import { PartialDiscordGuild } from 'remix-auth-socials';
 import { fetchWithBot, fetchWithUser } from '~/lib/api';
-import { DISCORD_BASE_URL, FeaturesKeys } from '~/lib/constants';
+import { DISCORD_BASE_URL } from '~/lib/constants';
+import { FeaturesKeys } from '~/lib/features';
 import { FeatureConfigs, GuildConfigs, PartialGuildChannel } from '~/type';
 import { bigintSerializer } from '~/utils/serializer-polyfill';
 import db from './db.server';

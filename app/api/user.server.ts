@@ -1,6 +1,6 @@
 import type { DiscordUser, Prisma } from '@prisma/client';
 import { PartialDiscordGuild } from 'remix-auth-socials';
-import { FeaturesKeys } from '~/lib/constants';
+import { FeaturesKeys } from '~/lib/features';
 import db from './db.server';
 
 const seedData = (guilds: PartialDiscordGuild[]) =>

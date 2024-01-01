@@ -2,7 +2,13 @@ import { NavLink, Outlet } from '@remix-run/react';
 import Logo from '~/components/Logo';
 import Navbar from '~/components/Navbar';
 import RouteLayout from '~/components/Wrappers/RouteLayout';
-import { FeatureTypes, Features, MAIN_SIDEBAR_MENU } from '~/lib/constants';
+import { FeatureTypes, Features } from '~/lib/features';
+import { AppRoutes } from '~/lib/route';
+
+export const MAIN_SIDEBAR_MENU = [
+  { to: './', label: 'Dashboard' },
+  { to: `./${AppRoutes.SETTINGS}`, label: 'Settings' },
+];
 
 export default function DashboardServerLayout() {
   const SERVER_MANAGEMENT_SIDEBAR_MENU = Features.filter(
