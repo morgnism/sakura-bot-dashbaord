@@ -1,5 +1,5 @@
-import classNames from 'classnames';
 import { DiscordUser } from '~/type';
+import { cn } from '~/utils/cn';
 import { imageUrlBuilder } from '~/utils/image-url-builder';
 import Button from '../Button';
 
@@ -32,10 +32,10 @@ const ProfileFlyoutMenuControl = ({
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={classNames([
+      className={cn(
         'ml-1 mr-1 text-[#c6c8d7] transition-all',
-        isMenuOpen ? 'scale-100' : '-scale-100',
-      ])}
+        isMenuOpen ? 'scale-100' : '-scale-100'
+      )}
     >
       <path
         d="M7 14.5l5-5 5 5"

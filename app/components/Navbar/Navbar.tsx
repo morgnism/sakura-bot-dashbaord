@@ -1,5 +1,5 @@
 import { Link, useLocation } from '@remix-run/react';
-import classNames from 'classnames';
+import { cn } from '~/utils/cn';
 import { hasChildPath } from '~/utils/path-utils';
 import Divider from '../Divider';
 import Logo from '../Logo';
@@ -13,12 +13,12 @@ const Navbar = () => {
 
   return (
     <nav
-      className={classNames([
+      className={cn(
         'flex items-center justify-between gap-6 h-16 lg:px-8',
         isDashboardPath
           ? 'bg-[#111827] border-b border-[#e5e7eb] shadow'
-          : 'max-w-7xl mx-auto',
-      ])}
+          : 'max-w-7xl mx-auto'
+      )}
       aria-label="global"
     >
       <div className="flex items-center gap-8 lg:gap-12">

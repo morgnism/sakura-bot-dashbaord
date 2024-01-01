@@ -1,6 +1,6 @@
 import { useFetcher } from '@remix-run/react';
-import classNames from 'classnames';
 import Button from '~/components/Button';
+import { cn } from '~/utils/cn';
 
 type ToggleSwitchProps = {
   name: string;
@@ -32,10 +32,10 @@ const ToggleSwitch = (props: ToggleSwitchProps) => {
       >
         <span
           aria-hidden="true"
-          className={classNames([
+          className={cn(
             'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-[#3b82f6] transition duration-200 ease-in-out',
-            enabled ? 'translate-x-5' : 'transform',
-          ])}
+            enabled ? 'translate-x-5' : 'transform'
+          )}
         ></span>
       </Button>
     </fetcher.Form>
