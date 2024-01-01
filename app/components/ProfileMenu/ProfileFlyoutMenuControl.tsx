@@ -1,7 +1,7 @@
 import { DiscordUser } from '~/type';
 import { cn } from '~/utils/cn';
 import { imageUrlBuilder } from '~/utils/image-url-builder';
-import Button from '../Button';
+import { Button } from '../ui/button';
 
 type ProfileFlyoutMenuControl = {
   id?: string;
