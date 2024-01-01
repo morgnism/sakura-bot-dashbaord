@@ -1,6 +1,6 @@
 import { Link, useLocation } from '@remix-run/react';
 import { cn } from '~/utils/cn';
-import { hasChildPath } from '~/utils/path-utils';
+import { hasChildPath } from '~/utils/path';
 import Divider from '../Divider';
 import Logo from '../Logo';
 import ProfileMenuButton from '../ProfileMenu';
