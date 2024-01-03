@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { useFetcher, useLoaderData, useSubmit } from '@remix-run/react';
+import { Link, useFetcher, useLoaderData, useSubmit } from '@remix-run/react';
 import { useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import * as z from 'zod';
@@ -105,9 +105,14 @@ export default function DashboardServerHomePage() {
                 name={key}
                 render={({ field }) => (
                   <FormItem className="flex flex-col items-start lg:flex-row lg:items-center justify-between rounded-lg border border-[#27272a] p-4">
-                    <div className="space-y-0.5 pr-2 md:pr-0">
+                    <div className="space-y-0.5 md:pr-2 pr-0">
                       <FormLabel className="text-base">
-                        {feature.label}
+                        <Link
+                          to={feature.to}
+                          className="transition hover:underline"
+                        >
+                          {feature.label}
+                        </Link>
                       </FormLabel>
                       <FormDescription>{feature.description}</FormDescription>
                     </div>
