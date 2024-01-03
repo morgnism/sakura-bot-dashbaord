@@ -91,7 +91,7 @@ export default function DashboardServerHomePage() {
   };
 
   return (
-    <div className="px-4 md:px-6 lg:px-8">
+    <>
       <div>
         <h3 className="mb-4 text-lg font-medium">DashboardServerHomePage</h3>
       </div>
@@ -130,6 +130,6 @@ export default function DashboardServerHomePage() {
           </div>
         </fetcher.Form>
       </Form>
-    </div>
+    </>
   );
 }
