@@ -1,7 +1,6 @@
 import { NavLink, Outlet } from '@remix-run/react';
 import Logo from '~/components/Logo';
 import Navbar from '~/components/Navbar';
-import RouteLayout from '~/components/Wrappers/RouteLayout';
 import { FeatureTypes, Features } from '~/lib/features';
 import { AppRoutes } from '~/lib/route';
 
@@ -107,9 +106,9 @@ export default function DashboardServerLayout() {
 
       <div className="lg:pl-72">
         <Navbar />
-        <RouteLayout className="py-10">
+        <div className="py-10">
           <Outlet />
-        </RouteLayout>
+        </div>
       </div>
     </>
   );
