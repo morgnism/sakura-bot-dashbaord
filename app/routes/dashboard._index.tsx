@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { Link, useLoaderData } from '@remix-run/react';
-import MainLayout from '~/components/Wrappers/MainLayout';
+import MainLayout from '~/components/MainLayout';
 import { AppRoutes } from '~/lib/route';
 import { authenticator } from '~/server/auth.server';
 import { imageUrlBuilder } from '~/utils/image-url-builder';
