@@ -97,15 +97,15 @@ export default function DashboardServerHomePage() {
       </div>
       <Form {...form}>
         <fetcher.Form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="mb-16 mt-14 grid w-full grid-cols-[1fr_1fr_1fr] gap-10">
+          <div className="mb-16 mt-14 grid w-full md:grid-cols-3 grid-cols-2 gap-10">
             {features.map(([key, feature]) => (
               <FormField
                 key={key}
                 control={form.control}
                 name={key}
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
+                  <FormItem className="flex flex-col items-start lg:flex-row lg:items-center justify-between rounded-lg border border-[#27272a] p-4">
+                    <div className="space-y-0.5 pr-2 md:pr-0">
                       <FormLabel className="text-base">
                         {feature.label}
                       </FormLabel>

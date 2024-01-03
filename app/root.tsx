@@ -56,7 +56,7 @@ const Document = ({
         <Links />
         {title ? <title>{title}</title> : null}
       </head>
-      <body className="bg-[hsl(240,10%,3.9%)] text-white">
+      <body className="bg-[#09090b] text-white">
         {children}
 
         <ScrollRestoration />
