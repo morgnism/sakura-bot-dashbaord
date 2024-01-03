@@ -16,7 +16,7 @@ const ProfileFlyoutMenuControl = ({
 }: ProfileFlyoutMenuControl) => (
   <Button
     type="button"
-    className="flex cursor-pointer items-center py-1"
+    className="flex cursor-pointer items-center p-0 bg-transparent hover:bg-transparent"
     onClick={openMenu}
   >
     <img

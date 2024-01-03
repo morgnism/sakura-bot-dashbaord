@@ -7,7 +7,7 @@ type NotificationBellProps = {
 const NotificationBell = ({ onClick }: NotificationBellProps) => (
   <Button
     type="button"
-    className="text-[#9ca3af] hover:text-[#6b7280] p-0"
+    className="text-[#9ca3af] hover:text-[#6b7280] p-0 bg-transparent hover:bg-transparent"
     onClick={onClick}
   >
     <span className="sr-only">View notifications</span>
