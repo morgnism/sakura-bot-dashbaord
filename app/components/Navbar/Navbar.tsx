@@ -1,9 +1,9 @@
 import { Link, useLocation } from '@remix-run/react';
 import { cn } from '~/utils/cn';
 import { hasChildPath } from '~/utils/path';
-import Divider from '../Divider';
 import Logo from '../Logo';
 import ProfileMenuButton from '../ProfileMenu';
+import { Separator } from '../ui/separator';
 import MobileButton from './MobileButton';
 import NotificationBell from './NotificationBell';
 
@@ -25,7 +25,7 @@ const Navbar = () => {
         {isDashboardPath ? (
           <>
             <MobileButton onClick={() => {}} />
-            <Divider className="lg:hidden" />
+            <Separator className="lg:hidden h-6" orientation="vertical" />
           </>
         ) : (
           <>
@@ -43,7 +43,7 @@ const Navbar = () => {
         {isDashboardPath && (
           <>
             <NotificationBell onClick={() => {}} />
-            <Divider className="lg:block md:hidden" />
+            <Separator className="lg:block hidden h-6" orientation="vertical" />
           </>
         )}
         <ProfileMenuButton />
