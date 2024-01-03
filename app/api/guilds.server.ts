@@ -2,7 +2,7 @@ import type { GuildConfig, Prisma } from '@prisma/client';
 import { PartialDiscordGuild } from 'remix-auth-socials';
 import { fetchWithBot, fetchWithUser } from '~/lib/api';
 import { DISCORD_BASE_URL } from '~/lib/constants';
-import { FeaturesKeys } from '~/lib/features';
+import { FeatureKeys } from '~/lib/features';
 import { FeatureConfigs, GuildConfigs, PartialGuildChannel } from '~/type';
 import { bigintSerializer } from '~/utils/serializer';
 import db from './db.server';
@@ -31,7 +31,7 @@ export const fetchGuildChannels = async (
 // Gets all the configs for a guild with their enabled status
 export const getAllConfigs = async (serverId: string) => {
   const guildId: GuildConfig['id'] = BigInt(serverId);
-  const include = Object.values(FeaturesKeys).reduce(
+  const include = Object.values(FeatureKeys).reduce(
     (b: Omit<Prisma.GuildConfigInclude, 'id'>, module) => ({
       ...b,
       [module]: { where: { guildId }, select: { enabled: true } },
@@ -72,19 +72,33 @@ export const getFeatures = async (
   return configs;
 };
 
-export const updateFeature = async (
+export const updateFeature = async <T extends {}>(
   serverId: string,
-  updates: {
-    name: string;
-    enabled: boolean;
-  }
+  updates: T
 ) => {
   const guildId: GuildConfig['id'] = BigInt(serverId);
-  const { name, ...rest } = updates;
+  const guildUpdates = Object.entries(updates).reduce(
+    (a, [name, enabled]) => {
+      return {
+        ...a,
+        select: {
+          ...a.select,
+          [name]: true,
+        },
+        data: {
+          ...a.data,
+          [name]: { update: { enabled } },
+        },
+      };
+    },
+    {
+      select: {} as Prisma.GuildConfigSelect,
+      data: {} as Prisma.GuildConfigUpdateInput,
+    }
+  );
   const config = await db.guildConfig.update({
     where: { id: guildId },
-    select: { [name]: true },
-    data: { [name]: { update: { ...rest } } },
+    ...guildUpdates,
   });
 
   const serialize = JSON.stringify(config, bigintSerializer);
