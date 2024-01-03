@@ -87,7 +87,7 @@ export default function DashboardServerHomePage() {
   const fetcher = useFetcher();
 
   const onSubmit = (data: ConfigFormData) => {
-    submit(data, { method: 'post' });
+    submit(data, { method: 'post', navigate: false });
   };
 
   return (
