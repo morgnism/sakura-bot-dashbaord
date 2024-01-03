@@ -72,19 +72,33 @@ export const getFeatures = async (
   return configs;
 };
 
-export const updateFeature = async (
+export const updateFeature = async <T extends {}>(
   serverId: string,
-  updates: {
-    name: string;
-    enabled: boolean;
-  }
+  updates: T
 ) => {
   const guildId: GuildConfig['id'] = BigInt(serverId);
-  const { name, ...rest } = updates;
+  const guildUpdates = Object.entries(updates).reduce(
+    (a, [name, enabled]) => {
+      return {
+        ...a,
+        select: {
+          ...a.select,
+          [name]: true,
+        },
+        data: {
+          ...a.data,
+          [name]: { update: { enabled } },
+        },
+      };
+    },
+    {
+      select: {} as Prisma.GuildConfigSelect,
+      data: {} as Prisma.GuildConfigUpdateInput,
+    }
+  );
   const config = await db.guildConfig.update({
     where: { id: guildId },
-    select: { [name]: true },
-    data: { [name]: { update: { ...rest } } },
+    ...guildUpdates,
   });
 
   const serialize = JSON.stringify(config, bigintSerializer);
