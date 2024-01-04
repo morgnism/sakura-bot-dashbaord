@@ -32,7 +32,7 @@ const Navbar = () => {
             <Logo />
             <Link
               to="/dashboard"
-              className="text-sm font-semibold leading-6 text-[#111827] dark:text-white"
+              className="text-sm font-semibold leading-6 text-white"
             >
               Dashboard
             </Link>
