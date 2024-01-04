@@ -4,7 +4,7 @@ import { Link, useFetcher, useLoaderData, useSubmit } from '@remix-run/react';
 import { useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import * as z from 'zod';
-import { getFeatures, updateFeature } from '~/api/guilds.server';
+import { getFeatures, updateFeatureStatus } from '~/api/guilds.server';
 import {
   Form,
   FormControl,
@@ -48,7 +48,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   try {
     const result = configFormSchema.parse(payload);
-    return updateFeature(params.serverId, result);
+    return updateFeatureStatus(params.serverId, result);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false, error: error.flatten() };

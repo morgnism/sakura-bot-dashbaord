@@ -29,9 +29,9 @@ export const fetchGuildChannels = async (
   fetchWithBot(`${DISCORD_BASE_URL}/guilds/${guildId}/channels`);
 
 // Gets all the configs for a guild with their enabled status
-export const getAllConfigs = async (serverId: string) => {
+export const getAllConfigEnabledStatuses = async (serverId: string) => {
   const guildId: GuildConfig['id'] = BigInt(serverId);
-  const include = Object.values(FeatureKeys).reduce(
+  const select = Object.values(FeatureKeys).reduce(
     (b: Omit<Prisma.GuildConfigInclude, 'id'>, module) => ({
       ...b,
       [module]: { where: { guildId }, select: { enabled: true } },
@@ -41,7 +41,7 @@ export const getAllConfigs = async (serverId: string) => {
 
   const configs = await db.guildConfig.findUnique({
     where: { id: guildId },
-    include,
+    select,
   });
   const serialize = JSON.stringify(configs, bigintSerializer);
   return JSON.parse(serialize) as GuildConfigs;
@@ -61,7 +61,7 @@ function isEnabled(value: any): value is {
 export const getFeatures = async (
   serverId: string
 ): Promise<FeatureConfigs[]> => {
-  const allSettings = await getAllConfigs(serverId);
+  const allSettings = await getAllConfigEnabledStatuses(serverId);
   const settings = Object.entries(allSettings);
   let configs = [];
   for (let [key, value] of settings) {
@@ -72,9 +72,11 @@ export const getFeatures = async (
   return configs;
 };
 
-export const updateFeature = async <T extends {}>(
+export const updateFeatureStatus = async (
   serverId: string,
-  updates: T
+  updates: {
+    [x: string]: boolean;
+  }
 ) => {
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const guildUpdates = Object.entries(updates).reduce(
