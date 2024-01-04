@@ -16,7 +16,6 @@ export type Feature = {
   to: string;
   label: string;
   enabled: boolean;
-  weight: number;
   type: FeatureTypes;
   description: string;
 };
@@ -29,7 +28,6 @@ export const FeatureMap = new Map<string, Feature>([
       label: 'Welcome',
       description: 'Send a welcome message to new members.',
       enabled: false,
-      weight: 1,
       type: FeatureTypes.SERVER_MANAGEMENT,
     },
   ],
@@ -40,7 +38,6 @@ export const FeatureMap = new Map<string, Feature>([
       label: 'Goodbye',
       description: 'Send a goodbye message to leaving members.',
       enabled: false,
-      weight: 2,
       type: FeatureTypes.SERVER_MANAGEMENT,
     },
   ],
@@ -51,7 +48,6 @@ export const FeatureMap = new Map<string, Feature>([
       label: 'Auto Roles',
       description: 'Let Sakura handle member roles.',
       enabled: false,
-      weight: 3,
       type: FeatureTypes.SERVER_MANAGEMENT,
     },
   ],
@@ -63,7 +59,6 @@ export const FeatureMap = new Map<string, Feature>([
       description:
         'Give moderators powerful moderation tools to keep this server safe.',
       enabled: false,
-      weight: 4,
       type: FeatureTypes.SERVER_MANAGEMENT,
     },
   ],

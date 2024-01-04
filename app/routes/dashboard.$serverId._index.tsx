@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { useFetcher, useLoaderData, useSubmit } from '@remix-run/react';
+import { Link, useFetcher, useLoaderData, useSubmit } from '@remix-run/react';
 import { useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import * as z from 'zod';
@@ -87,27 +87,32 @@ export default function DashboardServerHomePage() {
   const fetcher = useFetcher();
 
   const onSubmit = (data: ConfigFormData) => {
-    submit(data, { method: 'post' });
+    submit(data, { method: 'post', navigate: false });
   };
 
   return (
-    <div className="px-4 md:px-6 lg:px-8">
+    <>
       <div>
         <h3 className="mb-4 text-lg font-medium">DashboardServerHomePage</h3>
       </div>
       <Form {...form}>
         <fetcher.Form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="mb-16 mt-14 grid w-full grid-cols-[1fr_1fr_1fr] gap-10">
+          <div className="mb-16 mt-14 grid w-full md:grid-cols-3 xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-10">
             {features.map(([key, feature]) => (
               <FormField
                 key={key}
                 control={form.control}
                 name={key}
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border border-[#27272a] p-4">
+                    <div className="space-y-0.5 md:pr-2 pr-0">
                       <FormLabel className="text-base">
-                        {feature.label}
+                        <Link
+                          to={feature.to}
+                          className="transition hover:underline"
+                        >
+                          {feature.label}
+                        </Link>
                       </FormLabel>
                       <FormDescription>{feature.description}</FormDescription>
                     </div>
@@ -125,6 +130,6 @@ export default function DashboardServerHomePage() {
           </div>
         </fetcher.Form>
       </Form>
-    </div>
+    </>
   );
 }

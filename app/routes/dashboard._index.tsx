@@ -27,7 +27,7 @@ export default function DashboardServersPage() {
                 <div className="relative flex h-40 w-full items-center justify-center overflow-hidden">
                   <div className="absolute inset-0 z-[1] scale-[1.4] opacity-30 blur-[10px]"></div>
                   <img
-                    className="relative z-[2] h-40 w-40 shrink-0 rounded-full border-2 border-solid border-[#f2f4fb]"
+                    className="relative z-[2] h-40 w-40 shrink-0 rounded-full border-2 border-solid border-[#27272a]"
                     src={imageUrlBuilder(id, icon, { resource: 'icons' })}
                     alt={`${name} Logo`}
                   />
