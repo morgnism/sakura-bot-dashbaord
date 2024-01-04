@@ -1,5 +1,5 @@
 import { Form, Link } from '@remix-run/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useOptionalUser } from '~/hooks/useUser';
 import {
   DropdownMenu,
@@ -18,15 +18,20 @@ import DiscordSignInButton from './DiscordSignInButton';
 const ProfileMenuButton = () => {
   const [isOpen, setOpen] = useState(false);
   const user = useOptionalUser();
+  const boundaryRef = useRef(null);
 
   return (
     <>
       {user ? (
         <DropdownMenu onOpenChange={setOpen}>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger ref={boundaryRef}>
             <ProfileFlyoutMenuControl isMenuOpen={isOpen} user={user} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48">
+          <DropdownMenuContent
+            className="w-48"
+            collisionPadding={{ left: -200 }}
+            collisionBoundary={boundaryRef.current}
+          >
             <DropdownMenuLabel>Servers owners</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
