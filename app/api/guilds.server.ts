@@ -3,10 +3,28 @@ import { PartialDiscordGuild } from 'remix-auth-socials';
 import { fetchWithBot, fetchWithUser } from '~/lib/api';
 import { DISCORD_BASE_URL } from '~/lib/constants';
 import { FeatureKeys } from '~/lib/features';
-import { FeatureConfigs, GuildConfigs, PartialGuildChannel } from '~/type';
+import { FeatureConfigs, PartialGuildChannel } from '~/type';
 import { bigintSerializer } from '~/utils/serializer';
 import db from './db.server';
+
 export type { GuildConfig } from '@prisma/client';
+
+export type GuildSettings = {
+  id: string;
+  active: boolean;
+  prefix: string;
+  afkChannelId: string | null;
+  publicUpdatesChannelId: string | null;
+  rulesChannelId: string | null;
+  safetyAlertsChannelId: string | null;
+  systemChannelId: string | null;
+  createAt: Date;
+  updateAt: Date;
+};
+
+export type EnabledFeatures = {
+  [feature: string]: boolean;
+};
 
 // Get Bot as Guild Member
 export const fetchMe = async () =>
@@ -44,7 +62,7 @@ export const getAllConfigEnabledStatuses = async (serverId: string) => {
     select,
   });
   const serialize = JSON.stringify(configs, bigintSerializer);
-  return JSON.parse(serialize) as GuildConfigs;
+  return JSON.parse(serialize) as EnabledFeatures;
 };
 
 function isEnabled(value: any): value is {
@@ -72,11 +90,11 @@ export const getFeatures = async (
   return configs;
 };
 
+type UpdateGuildConfigMutation = EnabledFeatures;
+
 export const updateFeatureStatus = async (
   serverId: string,
-  updates: {
-    [x: string]: boolean;
-  }
+  updates: UpdateGuildConfigMutation
 ) => {
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const guildUpdates = Object.entries(updates).reduce(
@@ -104,5 +122,15 @@ export const updateFeatureStatus = async (
   });
 
   const serialize = JSON.stringify(config, bigintSerializer);
-  return JSON.parse(serialize) as GuildConfigs;
+  return JSON.parse(serialize);
+};
+
+// Gets the server's main settings
+export const getServerSettings = async (serverId: string) => {
+  const guildId: GuildConfig['id'] = BigInt(serverId);
+  const configs = await db.guildConfig.findUnique({
+    where: { id: guildId },
+  });
+  const serialize = JSON.stringify(configs, bigintSerializer);
+  return JSON.parse(serialize) as GuildSettings;
 };
