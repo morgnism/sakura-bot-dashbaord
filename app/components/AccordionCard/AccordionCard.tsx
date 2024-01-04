@@ -34,7 +34,7 @@ const AccordionCard = ({
             {description && <CardDescription>{description}</CardDescription>}
           </CardHeader>
           <AccordionContent>
-            <CardContent className="border-t border-zinc-800">
+            <CardContent className="pt-6 border-t border-zinc-800">
               {children}
             </CardContent>
           </AccordionContent>
