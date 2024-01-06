@@ -112,6 +112,8 @@ enum RoleType {
 
 model Role {
   id                      BigInt            @id
+  name                    String
+  color                   Int
   action                  RoleAction        @default(ADD)
   delay                   BigInt            @default(0)
   type                    RoleType          @default(DEFAULT)
