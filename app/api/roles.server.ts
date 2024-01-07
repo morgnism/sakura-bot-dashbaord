@@ -9,6 +9,7 @@ type RoleGroups = {
 
 // Gets the server's admin roles
 export const getAdminRoles = async (serverId: string): Promise<RoleGroups> => {
+  console.log(`Loading admin roles...`);
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const config = await db.roleConfig.findUnique({
     where: { guildId },
