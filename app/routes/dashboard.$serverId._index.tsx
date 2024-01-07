@@ -4,7 +4,14 @@ import { Link, useFetcher, useLoaderData, useSubmit } from '@remix-run/react';
 import { useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import * as z from 'zod';
-import { getFeatures, updateFeature } from '~/api/guilds.server';
+import {
+  EnabledFeatures,
+  activateGuild,
+  getActiveFeatures,
+  initiateFeatures,
+  setInitialRoles,
+  updateFeatureStatus,
+} from '~/api/guilds.server';
 import {
   Form,
   FormControl,
@@ -19,7 +26,10 @@ import { FeatureConfigs } from '~/type';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.serverId, 'Missing serverId param');
-  return await getFeatures(params.serverId);
+  await activateGuild(params.serverId);
+  await initiateFeatures(params.serverId);
+  await setInitialRoles(params.serverId);
+  return await getActiveFeatures(params.serverId);
 };
 
 type MappedFormFields = {
@@ -48,13 +58,37 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   try {
     const result = configFormSchema.parse(payload);
-    return updateFeature(params.serverId, result);
+    return updateFeatureStatus(params.serverId, result);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false, error: error.flatten() };
     }
     return { error };
   }
+};
+
+const isEnabled = (
+  value: any
+): value is {
+  enabled: boolean;
+} => {
+  return (
+    value &&
+    typeof value === 'object' &&
+    !(value instanceof Date) &&
+    'enabled' in value
+  );
+};
+
+export const getFeatures = (allSettings: EnabledFeatures): FeatureConfigs[] => {
+  const settings = Object.entries(allSettings);
+  let configs = [];
+  for (let [key, value] of settings) {
+    if (isEnabled(value)) {
+      configs.push({ name: key, enabled: value.enabled });
+    }
+  }
+  return configs;
 };
 
 const mapFeatures = (configs: FeatureConfigs[]) => {
@@ -76,7 +110,8 @@ const mapFormDefaults = (): ConfigFormData => {
 };
 
 export default function DashboardServerHomePage() {
-  const configs = useLoaderData<typeof loader>();
+  const allSettings = useLoaderData<typeof loader>();
+  const configs = getFeatures(allSettings);
   const features = mapFeatures(configs);
   const defaults = mapFormDefaults();
   const form = useForm<ConfigFormData>({

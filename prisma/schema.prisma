@@ -72,7 +72,7 @@ model RoleConfig {
   updateAt DateTime    @updatedAt @map("updated_at")
   guildId  BigInt      @unique @map("guild_id")
   guild    GuildConfig @relation(fields: [guildId], references: [id])
-  roles    Roles[]
+  roles    Role[]
 
   @@map("roleconfig")
 }
@@ -94,7 +94,7 @@ model ModerationConfig {
   updateAt            DateTime    @updatedAt @map("updated_at")
   guildId             BigInt      @unique @map("guild_id")
   guild               GuildConfig @relation(fields: [guildId], references: [id])
-  roles               Roles[]
+  roles               Role[]
 
   @@map("moderationconfig")
 }
@@ -110,8 +110,10 @@ enum RoleType {
   ADMINISTRATOR
 }
 
-model Roles {
+model Role {
   id                      BigInt            @id
+  name                    String
+  color                   Int
   action                  RoleAction        @default(ADD)
   delay                   BigInt            @default(0)
   type                    RoleType          @default(DEFAULT)
@@ -121,5 +123,5 @@ model Roles {
   moderationConfigGuildId BigInt?           @map("moderation_config_guild_id")
   moderationConfig        ModerationConfig? @relation(fields: [moderationConfigGuildId], references: [guildId])
 
-  @@map("roles")
+  @@map("role")
 }
