@@ -1,4 +1,4 @@
-import { type GuildConfig, type Prisma } from '@prisma/client';
+import { RoleType, type GuildConfig, type Prisma } from '@prisma/client';
 import { FeatureKeys } from '~/lib/features';
 import { ShortRole } from '~/type';
 import { hexToDecimal } from '~/utils/hex-to-decimal';
@@ -7,6 +7,8 @@ import db from './db.server';
 import { fetchGuildRoles } from '~/lib/api';
 
 export type { GuildConfig } from '@prisma/client';
+
+export const DEFAULT_ROLE = '@everyone';
 
 export type GuildSettings = {
   id: string;
@@ -69,7 +71,7 @@ export const setInitialRoles = async (serverId: string) => {
   const guildRoles = await fetchGuildRoles(serverId);
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const roles = guildRoles.reduce((a: Prisma.RoleCreateManyInput[], role) => {
-    if (role.name === '@everyone') {
+    if (role.name === DEFAULT_ROLE) {
       return a;
     }
 
@@ -115,6 +117,7 @@ export const updateFeatureStatus = async (
   serverId: string,
   updates: UpdateGuildConfigMutation
 ) => {
+  console.log(`Updating active feature status...`);
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const guildUpdates = Object.entries(updates).reduce(
     (a, [name, enabled]) => {
@@ -146,6 +149,7 @@ export const updateFeatureStatus = async (
 
 // Gets the server's main settings
 export const getServerSettings = async (serverId: string) => {
+  console.log(`Loading settings for Guild (${serverId})`);
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const configs = await db.guildConfig.findUnique({
     where: { id: guildId },
@@ -158,6 +162,7 @@ export const updateServerSettings = async (
   serverId: string,
   updates: UpdateSettingsMutation
 ) => {
+  console.log(`Updating server settings...`);
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const { prefix, roles } = updates;
   const rolesInputs: Prisma.RoleUpdateManyWithWhereWithoutRoleConfigInput[] =
@@ -166,9 +171,12 @@ export const updateServerSettings = async (
       data: {
         ...role,
         color: hexToDecimal(role.color),
+        type: role.type as RoleType,
+        protected: role.type === RoleType.ADMINISTRATOR,
       },
     }));
-  const config = await db.guildConfig.update({
+
+  return await db.guildConfig.update({
     where: { id: guildId },
     data: {
       prefix,
@@ -184,7 +192,4 @@ export const updateServerSettings = async (
       },
     },
   });
-
-  const serialize = JSON.stringify(config, bigintSerializer);
-  return JSON.parse(serialize);
 };

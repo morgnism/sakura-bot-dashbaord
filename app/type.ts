@@ -28,4 +28,5 @@ export type ShortRole = {
   id: string;
   color: string;
   name: string;
+  type: string;
 };
