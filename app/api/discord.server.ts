@@ -1,6 +1,6 @@
 import { PartialDiscordGuild } from 'remix-auth-socials';
-import { DISCORD_TOKEN } from './config';
-import { DISCORD_BASE_URL } from './constants';
+import { DISCORD_TOKEN } from '../lib/config';
+import { DISCORD_BASE_URL } from '../lib/constants';
 
 export type PartialGuildChannel = {
   id: string;

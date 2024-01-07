@@ -1,6 +1,6 @@
 import { RoleType, type GuildConfig } from '@prisma/client';
-import { ShortRole, fetchGuildRoles } from '~/lib/api';
 import db from './db.server';
+import { ShortRole } from './discord.server';
 
 type RoleGroups = {
   readonly guildRoles: ShortRole[];

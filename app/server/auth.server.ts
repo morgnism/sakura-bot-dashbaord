@@ -5,8 +5,8 @@ import {
   PartialDiscordGuild,
   SocialsProvider,
 } from 'remix-auth-socials';
+import { fetchUserGuilds } from '~/api/discord.server';
 import { createUser } from '~/api/user.server';
-import { fetchUserGuilds } from '~/lib/api';
 import { AUTH_URL } from '~/lib/config';
 import { sessionStorage } from './session.server';
 
