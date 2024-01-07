@@ -32,6 +32,13 @@ export type GuildRole = {
   unicode_emoji: string | null;
 };
 
+export type ShortRole = {
+  id: string;
+  color: string;
+  name: string;
+  type: string;
+};
+
 export const fetcher = async <T>(
   uri: string,
   { headers, ...options }: RequestInit = {}

@@ -1,10 +1,9 @@
 import { RoleType, type GuildConfig, type Prisma } from '@prisma/client';
 import { FeatureKeys } from '~/lib/features';
-import { ShortRole } from '~/type';
 import { hexToDecimal } from '~/utils/hex-to-decimal';
 import { bigintSerializer } from '~/utils/serializer';
 import db from './db.server';
-import { fetchGuildRoles } from '~/lib/api';
+import { ShortRole, fetchGuildRoles } from '~/lib/api';
 
 export type { GuildConfig } from '@prisma/client';
 
@@ -29,7 +28,7 @@ export type EnabledFeatures = {
 
 type UpdateGuildConfigMutation = EnabledFeatures;
 
-export type UpdateSettingsMutation = {
+type UpdateSettingsMutation = {
   prefix: string;
   roles: ShortRole[];
 };

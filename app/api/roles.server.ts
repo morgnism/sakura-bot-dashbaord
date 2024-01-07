@@ -1,9 +1,8 @@
 import { RoleType, type GuildConfig } from '@prisma/client';
-import { fetchGuildRoles } from '~/lib/api';
-import { ShortRole } from '~/type';
+import { ShortRole, fetchGuildRoles } from '~/lib/api';
 import db from './db.server';
 
-export type RoleGroups = {
+type RoleGroups = {
   readonly guildRoles: ShortRole[];
   adminRoles: ShortRole[];
 };

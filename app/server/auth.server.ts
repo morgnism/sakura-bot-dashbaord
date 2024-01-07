@@ -1,10 +1,24 @@
 import { Authenticator } from 'remix-auth';
-import { DiscordStrategy, SocialsProvider } from 'remix-auth-socials';
+import {
+  DiscordProfile,
+  DiscordStrategy,
+  PartialDiscordGuild,
+  SocialsProvider,
+} from 'remix-auth-socials';
 import { createUser } from '~/api/user.server';
 import { fetchUserGuilds } from '~/lib/api';
 import { AUTH_URL } from '~/lib/config';
-import { DiscordUser } from '~/type';
 import { sessionStorage } from './session.server';
+
+export type DiscordUser = {
+  id: DiscordProfile['id'];
+  displayName: DiscordProfile['displayName'];
+  avatar: DiscordProfile['__json']['avatar'];
+  email: DiscordProfile['__json']['email'];
+  guilds: PartialDiscordGuild[];
+  accessToken: string;
+  refreshToken: string;
+};
 
 export const authenticator = new Authenticator<DiscordUser>(sessionStorage);
 

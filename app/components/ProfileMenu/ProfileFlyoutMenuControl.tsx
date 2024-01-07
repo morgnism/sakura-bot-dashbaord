@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { DiscordUser } from '~/type';
+import { DiscordUser } from '~/server/auth.server';
 import { imageUrlBuilder } from '~/utils/image-url-builder';
 
 type ProfileFlyoutMenuControl = {

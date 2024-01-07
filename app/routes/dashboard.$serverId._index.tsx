@@ -22,7 +22,6 @@ import {
 } from '~/components/ui/form';
 import { Switch } from '~/components/ui/switch';
 import { FeatureKeys, FeatureMap } from '~/lib/features';
-import { FeatureConfigs } from '~/type';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.serverId, 'Missing serverId param');
@@ -78,6 +77,11 @@ const isEnabled = (
     !(value instanceof Date) &&
     'enabled' in value
   );
+};
+
+type FeatureConfigs = {
+  name: string;
+  enabled: boolean;
 };
 
 export const getFeatures = (allSettings: EnabledFeatures): FeatureConfigs[] => {

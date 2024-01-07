@@ -1,12 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RoleType } from '@prisma/client';
 import { ActionFunctionArgs } from '@remix-run/node';
-import {
-  Form as RemixForm,
-  useActionData,
-  useLoaderData,
-  useSubmit,
-} from '@remix-run/react';
+import { Form as RemixForm, useLoaderData, useSubmit } from '@remix-run/react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { ControllerRenderProps, UseFormReturn, useForm } from 'react-hook-form';
 import { LoaderFunctionArgs } from 'react-router';
@@ -34,8 +29,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover';
+import { ShortRole } from '~/lib/api';
 import { DEFAULT_PREFIX } from '~/lib/constants';
-import { ShortRole } from '~/type';
 import { cn } from '~/utils/cn';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
