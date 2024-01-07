@@ -9,6 +9,7 @@ import {
   activateGuild,
   getActiveFeatures,
   initiateFeatures,
+  setInitialChannels,
   setInitialRoles,
   updateFeatureStatus,
 } from '~/api/guilds.server';
@@ -28,6 +29,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   await activateGuild(params.serverId);
   await initiateFeatures(params.serverId);
   await setInitialRoles(params.serverId);
+  await setInitialChannels(params.serverId);
   return await getActiveFeatures(params.serverId);
 };
 

@@ -21,13 +21,6 @@ model GuildConfig {
   prefix String  @default("$")
   active Boolean @default(false)
 
-  // server activity channel to write command logs to
-  systemChannelId        BigInt? @map("system_channel_id")
-  afkChannelId           BigInt? @map("afk_channel_id")
-  rulesChannelId         BigInt? @map("rules_channel_id")
-  publicUpdatesChannelId BigInt? @map("public_updates_channel_id")
-  safetyAlertsChannelId  BigInt? @map("safety_alerts_channel_id")
-
   welcomeConfig    WelcomeConfig?
   leaveConfig      LeaveConfig?
   roleConfig       RoleConfig?
@@ -36,8 +29,18 @@ model GuildConfig {
   createAt DateTime      @default(now()) @map("created_at")
   updateAt DateTime      @updatedAt @map("updated_at")
   users    DiscordUser[]
+  channels Channels[]
 
   @@map("guildconfig")
+}
+
+model Channels {
+  id               BigInt      @id
+  name             String      @db.VarChar(100)
+  type             Int
+  isUpdatesChannel Boolean     @default(false) @map("is_updates_channel")
+  guildId          BigInt      @map("guild_id")
+  guild            GuildConfig @relation(fields: [guildId], references: [id])
 }
 
 model WelcomeConfig {

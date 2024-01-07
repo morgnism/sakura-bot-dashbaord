@@ -3,24 +3,17 @@ import { FeatureKeys } from '~/lib/features';
 import { hexToDecimal } from '~/utils/hex-to-decimal';
 import { bigintSerializer } from '~/utils/serializer';
 import db from './db.server';
-import { ShortRole, fetchGuildRoles } from './discord.server';
+import {
+  ShortRole,
+  fetchGuildChannels,
+  fetchGuildRoles,
+} from './discord.server';
 
 export type { GuildConfig } from '@prisma/client';
 
 export const DEFAULT_ROLE = '@everyone';
 
-export type GuildSettings = {
-  id: string;
-  active: boolean;
-  prefix: string;
-  afkChannelId: string | null;
-  publicUpdatesChannelId: string | null;
-  rulesChannelId: string | null;
-  safetyAlertsChannelId: string | null;
-  systemChannelId: string | null;
-  createAt: Date;
-  updateAt: Date;
-};
+type GuildSettings = Omit<GuildConfig, 'id'> & { id: string };
 
 export type EnabledFeatures = {
   [feature: string]: boolean;
@@ -58,15 +51,25 @@ export const initiateFeatures = async (serverId: string) => {
     },
     {}
   );
+  const select = Object.values(FeatureKeys).reduce(
+    (a: Prisma.GuildConfigSelect, key) => {
+      return {
+        ...a,
+        [key]: true,
+      };
+    },
+    {}
+  );
 
   return await db.guildConfig.update({
     where: { id: guildId },
     data: updates,
+    select,
   });
 };
 
 export const setInitialRoles = async (serverId: string) => {
-  console.log(`Setting initials guild roles...`);
+  console.log(`Setting guild roles...`);
   const guildRoles = await fetchGuildRoles(serverId);
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const roles = guildRoles.reduce((a: Prisma.RoleCreateManyInput[], role) => {
@@ -88,6 +91,35 @@ export const setInitialRoles = async (serverId: string) => {
     data: {
       roles: { createMany: { data: roles, skipDuplicates: true } },
     },
+    select: { roles: true },
+  });
+};
+
+export const setInitialChannels = async (serverId: string) => {
+  console.log(`Setting guild channels...`);
+  const guildChannels = await fetchGuildChannels(serverId);
+  const guildId: GuildConfig['id'] = BigInt(serverId);
+  const channels = guildChannels.reduce(
+    (a: Prisma.ChannelsCreateManyGuildInput[], channel) => {
+      a.push({
+        id: BigInt(channel.id),
+        name: channel.name,
+        type: channel.type,
+      });
+
+      return a;
+    },
+    []
+  );
+
+  return await db.guildConfig.update({
+    where: { id: guildId },
+    data: {
+      channels: {
+        createMany: { data: channels, skipDuplicates: true },
+      },
+    },
+    select: { channels: true },
   });
 };
 
