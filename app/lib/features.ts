@@ -3,7 +3,7 @@ import { AppRoutes } from './route';
 export const FeatureKeys = {
   WELCOME: 'welcomeConfig',
   LEAVE: 'leaveConfig',
-  AUTOROLE: 'autoroleConfig',
+  AUTOROLE: 'roleConfig',
   MODERATION: 'moderationConfig',
 };
 

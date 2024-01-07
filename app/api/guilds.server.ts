@@ -179,7 +179,7 @@ export const updateServerSettings = async (
     where: { id: guildId },
     data: {
       prefix,
-      autoroleConfig: {
+      roleConfig: {
         update: {
           where: { guildId },
           data: {

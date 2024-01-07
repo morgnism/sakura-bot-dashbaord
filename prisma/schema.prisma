@@ -30,7 +30,7 @@ model GuildConfig {
 
   welcomeConfig    WelcomeConfig?
   leaveConfig      LeaveConfig?
-  autoroleConfig   RoleConfig?
+  roleConfig       RoleConfig?
   moderationConfig ModerationConfig?
 
   createAt DateTime      @default(now()) @map("created_at")
