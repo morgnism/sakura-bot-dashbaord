@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -15,17 +15,25 @@ import {
 
 type AccordionCardProps = {
   title: string;
-  description: string;
+  description?: string | ReactNode;
+  id?: string;
+  isOpenByDefault?: boolean;
 };
 
 const AccordionCard = ({
   title,
   description,
+  id = 'item-1',
+  isOpenByDefault = false,
   children,
 }: PropsWithChildren<AccordionCardProps>) => {
   return (
-    <Accordion type="single" collapsible>
-      <AccordionItem className="border-none" value="item-1">
+    <Accordion
+      type="single"
+      defaultValue={isOpenByDefault ? id : undefined}
+      collapsible
+    >
+      <AccordionItem className="border-none" value={id}>
         <Card>
           <CardHeader>
             <AccordionTrigger>
