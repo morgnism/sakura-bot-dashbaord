@@ -45,7 +45,7 @@ export default function DashboardServerLayout() {
     <>
       <div
         id="sidebar"
-        className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col"
+        className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col"
       >
         <div className="flex flex-grow flex-col gap-y-5 overflow-y-auto border-r border-[#27272a] px-6 pb-1">
           <Logo className="flex h-16 shrink-0 items-center" />
@@ -68,7 +68,7 @@ export default function DashboardServerLayout() {
         </div>
       </div>
 
-      <div className="lg:pl-72">
+      <div className="lg:pl-64">
         <Navbar />
         <div className="py-10 px-4 md:px-6 lg:px-8">
           <Outlet />
@@ -91,12 +91,12 @@ const SidebarMenu = ({ menu, className }: SidebarMenu) => (
           to={to}
           className={({ isActive }) =>
             isActive
-              ? 'bg-[#1f2937] text-white bqg flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold items-center'
-              : 'hover:bg-[#1f2937] text-[#9ca3af] hover:text-white bqg flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold items-center group'
+              ? 'bg-zinc-800 text-zinc-50 bqg flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold items-center'
+              : 'text-zinc-50 hover:bg-zinc-800 hover:text-zinc-50 bqg flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold items-center group'
           }
           end
         >
-          <Icon className="group-hover:text-white h-5 w-5 shrink-0" />
+          <Icon className="group-hover:text-zinc-50 h-5 w-5 shrink-0" />
           {label}
         </NavLink>
       </li>
