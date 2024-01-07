@@ -1,11 +1,10 @@
-import type { GuildConfig, Prisma } from '@prisma/client';
-import { PartialDiscordGuild } from 'remix-auth-socials';
-import { fetchWithBot, fetchWithUser } from '~/lib/api';
-import { DISCORD_BASE_URL } from '~/lib/constants';
+import { type GuildConfig, type Prisma } from '@prisma/client';
 import { FeatureKeys } from '~/lib/features';
-import { FeatureConfigs, PartialGuildChannel } from '~/type';
+import { ShortRole } from '~/type';
+import { hexToDecimal } from '~/utils/hex-to-decimal';
 import { bigintSerializer } from '~/utils/serializer';
 import db from './db.server';
+import { fetchGuildRoles } from '~/lib/api';
 
 export type { GuildConfig } from '@prisma/client';
 
@@ -26,32 +25,78 @@ export type EnabledFeatures = {
   [feature: string]: boolean;
 };
 
-// Get Bot as Guild Member
-export const fetchMe = async () =>
-  await fetchWithBot(`${DISCORD_BASE_URL}/users/@me`);
+type UpdateGuildConfigMutation = EnabledFeatures;
 
-// Get Guilds Bot is a member of
-export const fetchBotGuilds = async (): Promise<PartialDiscordGuild[]> =>
-  await fetchWithBot(`${DISCORD_BASE_URL}/users/@me/guilds`);
+export type UpdateSettingsMutation = {
+  prefix: string;
+  roles: ShortRole[];
+};
 
-// Get Guilds User is a member of
-export const fetchUserGuilds = async (
-  accessToken: string
-): Promise<PartialDiscordGuild[]> =>
-  await fetchWithUser(`${DISCORD_BASE_URL}/users/@me/guilds`, accessToken);
+export const activateGuild = async (serverId: string) => {
+  console.log(`Activating Guild (${serverId})`);
+  const guildId: GuildConfig['id'] = BigInt(serverId);
 
-// Get Guilds channels for a guild
-export const fetchGuildChannels = async (
-  guildId: string
-): Promise<PartialGuildChannel[]> =>
-  fetchWithBot(`${DISCORD_BASE_URL}/guilds/${guildId}/channels`);
+  return await db.guildConfig.upsert({
+    where: { id: guildId },
+    create: { id: guildId, active: true },
+    update: { active: { set: true } },
+  });
+};
+
+export const initiateFeatures = async (serverId: string) => {
+  console.log(`Initiating Guild Features (${serverId})`);
+  const guildId: GuildConfig['id'] = BigInt(serverId);
+  const updates = Object.values(FeatureKeys).reduce(
+    (a: Prisma.GuildConfigUpdateInput, key) => {
+      return {
+        ...a,
+        [key]: {
+          connectOrCreate: { where: { guildId }, create: { enabled: false } },
+        },
+      };
+    },
+    {}
+  );
+
+  return await db.guildConfig.update({
+    where: { id: guildId },
+    data: updates,
+  });
+};
+
+export const setInitialRoles = async (serverId: string) => {
+  console.log(`Setting initials guild roles...`);
+  const guildRoles = await fetchGuildRoles(serverId);
+  const guildId: GuildConfig['id'] = BigInt(serverId);
+  const roles = guildRoles.reduce((a: Prisma.RoleCreateManyInput[], role) => {
+    if (role.name === '@everyone') {
+      return a;
+    }
+
+    a.push({
+      id: BigInt(role.id),
+      name: role.name,
+      color: role.color,
+    });
+
+    return a;
+  }, []);
+
+  return await db.roleConfig.update({
+    where: { guildId },
+    data: {
+      roles: { createMany: { data: roles, skipDuplicates: true } },
+    },
+  });
+};
 
 // Gets all the configs for a guild with their enabled status
-export const getAllConfigEnabledStatuses = async (serverId: string) => {
+export const getActiveFeatures = async (serverId: string) => {
+  console.log(`Loading active features...`);
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const select = Object.values(FeatureKeys).reduce(
-    (b: Omit<Prisma.GuildConfigInclude, 'id'>, module) => ({
-      ...b,
+    (a: Prisma.GuildConfigInclude, module) => ({
+      ...a,
       [module]: { where: { guildId }, select: { enabled: true } },
     }),
     {}
@@ -61,36 +106,10 @@ export const getAllConfigEnabledStatuses = async (serverId: string) => {
     where: { id: guildId },
     select,
   });
+
   const serialize = JSON.stringify(configs, bigintSerializer);
   return JSON.parse(serialize) as EnabledFeatures;
 };
-
-function isEnabled(value: any): value is {
-  enabled: boolean;
-} {
-  return (
-    value &&
-    typeof value === 'object' &&
-    !(value instanceof Date) &&
-    'enabled' in value
-  );
-}
-
-export const getFeatures = async (
-  serverId: string
-): Promise<FeatureConfigs[]> => {
-  const allSettings = await getAllConfigEnabledStatuses(serverId);
-  const settings = Object.entries(allSettings);
-  let configs = [];
-  for (let [key, value] of settings) {
-    if (isEnabled(value)) {
-      configs.push({ name: key, enabled: value.enabled });
-    }
-  }
-  return configs;
-};
-
-type UpdateGuildConfigMutation = EnabledFeatures;
 
 export const updateFeatureStatus = async (
   serverId: string,
@@ -133,4 +152,39 @@ export const getServerSettings = async (serverId: string) => {
   });
   const serialize = JSON.stringify(configs, bigintSerializer);
   return JSON.parse(serialize) as GuildSettings;
+};
+
+export const updateServerSettings = async (
+  serverId: string,
+  updates: UpdateSettingsMutation
+) => {
+  const guildId: GuildConfig['id'] = BigInt(serverId);
+  const { prefix, roles } = updates;
+  const rolesInputs: Prisma.RoleUpdateManyWithWhereWithoutRoleConfigInput[] =
+    roles.map(({ id, ...role }) => ({
+      where: { id: BigInt(id) },
+      data: {
+        ...role,
+        color: hexToDecimal(role.color),
+      },
+    }));
+  const config = await db.guildConfig.update({
+    where: { id: guildId },
+    data: {
+      prefix,
+      autoroleConfig: {
+        update: {
+          where: { guildId },
+          data: {
+            roles: {
+              updateMany: rolesInputs,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const serialize = JSON.stringify(config, bigintSerializer);
+  return JSON.parse(serialize);
 };

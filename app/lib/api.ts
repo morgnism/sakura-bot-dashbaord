@@ -1,4 +1,36 @@
+import { PartialDiscordGuild } from 'remix-auth-socials';
 import { DISCORD_TOKEN } from './config';
+import { DISCORD_BASE_URL } from './constants';
+
+export type PartialGuildChannel = {
+  id: string;
+  last_message_id: string;
+  type: number;
+  name: string;
+  position: number;
+  parent_id?: string;
+  topic?: string;
+  guild_id: string;
+  permission_overwrites: string[];
+  nsfw: boolean;
+  rate_limit_per_user: string;
+  banner?: string;
+};
+
+export type GuildRole = {
+  id: string;
+  color: number;
+  description: string | null;
+  flags: number;
+  hoist: boolean;
+  icon: number | null;
+  managed: boolean;
+  mentionable: boolean;
+  name: string;
+  permissions: string;
+  position: number;
+  unicode_emoji: string | null;
+};
 
 export const fetcher = async <T>(
   uri: string,
@@ -32,3 +64,27 @@ export const fetchWithUser = <T>(
       Authorization: `Bearer ${accessToken}`,
     },
   });
+
+// Get Bot as Guild Member
+export const fetchMe = async () =>
+  await fetchWithBot(`${DISCORD_BASE_URL}/users/@me`);
+
+// Get Guilds Bot is a member of
+export const fetchBotGuilds = async (): Promise<PartialDiscordGuild[]> =>
+  await fetchWithBot(`${DISCORD_BASE_URL}/users/@me/guilds`);
+
+// Get All Guild roles
+export const fetchGuildRoles = async (guildId: string): Promise<GuildRole[]> =>
+  await fetchWithBot(`${DISCORD_BASE_URL}/guilds/${guildId}/roles`);
+
+// Get Guilds User is a member of
+export const fetchUserGuilds = async (
+  accessToken: string
+): Promise<PartialDiscordGuild[]> =>
+  await fetchWithUser(`${DISCORD_BASE_URL}/users/@me/guilds`, accessToken);
+
+// Get Guilds channels for a guild
+export const fetchGuildChannels = async (
+  guildId: string
+): Promise<PartialGuildChannel[]> =>
+  fetchWithBot(`${DISCORD_BASE_URL}/guilds/${guildId}/channels`);
