@@ -7,7 +7,12 @@ import { ControllerRenderProps, UseFormReturn, useForm } from 'react-hook-form';
 import { LoaderFunctionArgs } from 'react-router';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
-import { getServerSettings, updateServerSettings } from '~/api/guilds.server';
+import { ShortRole } from '~/api/discord.server';
+import {
+  getServerChannels,
+  getServerSettings,
+  updateServerSettings,
+} from '~/api/guilds.server';
 import { getAdminRoles } from '~/api/roles.server';
 import AccordionCard from '~/components/AccordionCard';
 import CopyButton from '~/components/CopyButton/CopyButton';
@@ -29,29 +34,40 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover';
-import { ShortRole } from '~/lib/api';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
 import { DEFAULT_PREFIX } from '~/lib/constants';
 import { cn } from '~/utils/cn';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.serverId, 'Missing serverId param');
-  const [settings, { guildRoles, adminRoles }] = await Promise.all([
+  const [
+    settings,
+    { guildRoles, adminRolesIds },
+    { guildChannels, selectedChannelId },
+  ] = await Promise.all([
     getServerSettings(params.serverId),
     getAdminRoles(params.serverId),
+    getServerChannels(params.serverId),
   ]);
-  return { settings, guildRoles, adminRoles };
+  return {
+    settings,
+    guildRoles,
+    adminRolesIds,
+    guildChannels,
+    selectedChannelId,
+  };
 };
 
 const settingsFormSchema = z.object({
   prefix: z.string(),
-  roles: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      color: z.string(),
-      type: z.string(),
-    })
-  ),
+  roles: z.array(z.string()),
+  updatesChannel: z.string(),
 });
 
 type SettingsFormData = z.infer<typeof settingsFormSchema>;
@@ -66,6 +82,10 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     payload.roles = JSON.parse(payload.roles);
   }
 
+  if (typeof payload.channels === 'string') {
+    payload.channels = JSON.parse(payload.channels);
+  }
+
   try {
     const result = settingsFormSchema.parse(payload);
     return await updateServerSettings(params.serverId, result);
@@ -77,36 +97,28 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   }
 };
 
-const prepareRolesFormData = (allRoles: ShortRole[], formData: ShortRole[]) =>
-  allRoles.map((role) => {
-    const foundRole = formData.find((data) => data.id === role.id);
-    if (foundRole) {
-      return {
-        ...role,
-        type: RoleType.ADMINISTRATOR,
-      };
-    }
-
-    return {
-      ...role,
-      type: RoleType.DEFAULT,
-    };
-  });
+const exampleCommands = ['help', 'moderators'];
 
 export default function GuildSettingsPage() {
-  const { settings, guildRoles, adminRoles } = useLoaderData<typeof loader>();
+  const {
+    settings,
+    guildRoles,
+    adminRolesIds,
+    guildChannels,
+    selectedChannelId,
+  } = useLoaderData<typeof loader>();
   const form = useForm<SettingsFormData>({
     resolver: zodResolver(settingsFormSchema),
     defaultValues: {
       prefix: DEFAULT_PREFIX,
-      roles: adminRoles,
+      roles: adminRolesIds,
+      updatesChannel: selectedChannelId,
     },
   });
   const submit = useSubmit();
 
   const onSubmit = (data: SettingsFormData) => {
-    const preparedRoles = prepareRolesFormData(guildRoles, data.roles);
-    const roles = JSON.stringify(preparedRoles);
+    const roles = JSON.stringify(data.roles);
     submit({ ...data, roles }, { method: 'post' });
   };
 
@@ -125,7 +137,11 @@ export default function GuildSettingsPage() {
       {/* TODO: delete after prod release */}
       {/* <pre className="rounded-md bg-zinc-800 p-4">
         <code className="text-white">
-          {JSON.stringify({ ...settings, guildRoles, adminRoles }, null, 2)}
+          {JSON.stringify(
+            { ...settings, adminRolesIds, selectedChannelId },
+            null,
+            2
+          )}
         </code>
       </pre> */}
 
@@ -149,9 +165,14 @@ export default function GuildSettingsPage() {
                     <FormControl>
                       <Input placeholder="$" {...field} />
                     </FormControl>
-                    <FormDescription>
-                      This is your public display name.
-                    </FormDescription>
+                    <div className="flex gap-2">
+                      {exampleCommands.map((cmd) => (
+                        <Badge key={cmd} variant="outline">
+                          {field.value}
+                          <FormDescription>{cmd}</FormDescription>
+                        </Badge>
+                      ))}
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -164,7 +185,46 @@ export default function GuildSettingsPage() {
             isOpenByDefault={true}
           >
             <div className="grid gap-2">
-              <ComboBoxMenuField form={form} values={guildRoles} />
+              <ComboBoxRoleField form={form} values={guildRoles} />
+            </div>
+          </AccordionCard>
+          <AccordionCard
+            title="Updates Channel"
+            description="Tell Sakura where to publish new updates."
+            isOpenByDefault={true}
+          >
+            <div className="grid gap-2">
+              <FormField
+                control={form.control}
+                name="updatesChannel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Available Guild Channels</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a guild channel" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {guildChannels.map(({ id, name }) => (
+                          <SelectItem key={id} value={id}>
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      All bot communicates apart from text and slash commands
+                      will appear in this channel.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </AccordionCard>
           {form.formState.isDirty && <Button type="submit">Save</Button>}
@@ -174,19 +234,19 @@ export default function GuildSettingsPage() {
   );
 }
 
-type ComboBoxMenuFieldProps = {
+type ComboBoxRoleFieldProps = {
   form: UseFormReturn<SettingsFormData, any, undefined>;
   values: ShortRole[];
 };
 
-const ComboBoxMenuField = ({ form, values }: ComboBoxMenuFieldProps) => (
+const ComboBoxRoleField = ({ form, values }: ComboBoxRoleFieldProps) => (
   <FormField
     control={form.control}
     name="roles"
     render={({ field }) => (
       <FormItem className="flex flex-col">
         <FormLabel>Administrator Roles</FormLabel>
-        <ComboboxDropdownMenu form={form} values={values} field={field} />
+        <ComboBoxRoleSelect form={form} values={values} field={field} />
         <FormDescription>
           These are the roles that will have bot admin permissions.
         </FormDescription>
@@ -196,39 +256,33 @@ const ComboBoxMenuField = ({ form, values }: ComboBoxMenuFieldProps) => (
   />
 );
 
-type ComboboxDropdownMenuProps = {
+type ComboBoxRoleSelectProps = {
   form: UseFormReturn<SettingsFormData, any, undefined>;
   field: ControllerRenderProps<SettingsFormData, 'roles'>;
   values: ShortRole[];
 };
 
-const ComboboxDropdownMenu = ({
+const ComboBoxRoleSelect = ({
   form,
   field,
   values,
-}: ComboboxDropdownMenuProps) => {
-  const selectedItems = values.reduce((a: ShortRole[], role) => {
-    if (field.value.some((value) => value.id === role.id)) {
-      a.push(role);
-    }
-    return a;
-  }, []);
-
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <FormControl>
-          <Button
-            variant="outline"
-            role="combobox"
-            className={cn(
-              'w-[500px] justify-between h-[unset] min-h-10',
-              !field.value && 'text-muted-foreground'
-            )}
-          >
-            <div className="flex gap-2 flex-wrap">
-              {field.value.length
-                ? selectedItems.map((role) => (
+}: ComboBoxRoleSelectProps) => (
+  <Popover>
+    <PopoverTrigger asChild>
+      <FormControl>
+        <Button
+          variant="outline"
+          role="combobox"
+          className={cn(
+            'justify-between h-[unset] min-h-10',
+            !field.value && 'text-muted-foreground'
+          )}
+        >
+          <div className="flex gap-2 flex-wrap">
+            {field.value.length
+              ? values
+                  .filter((role) => field.value.includes(role.id))
+                  .map((role) => (
                     <Badge
                       key={role.id}
                       style={{ backgroundColor: `#${role.color}` }}
@@ -236,56 +290,53 @@ const ComboboxDropdownMenu = ({
                       {role.name}
                     </Badge>
                   ))
-                : 'Select a role'}
-            </div>
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </FormControl>
-      </PopoverTrigger>
-      <PopoverContent className="w-[500px] p-0">
-        <Command>
-          <CommandGroup>
-            {values.map((role) => (
-              <CommandItem
-                value={role.name}
-                key={role.id}
-                onSelect={() => {
-                  const added = field.value.find(
-                    (value) => value.id === role.id
+              : 'Select a role'}
+          </div>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </FormControl>
+    </PopoverTrigger>
+    <PopoverContent className="min-w-96 p-0">
+      <Command>
+        <CommandGroup>
+          {values.map((role) => (
+            <CommandItem
+              value={role.name}
+              key={role.id}
+              onSelect={() => {
+                const added = field.value.find((value) => value === role.id);
+                if (added) {
+                  const filtered = field.value.filter(
+                    (value) => value !== added
                   );
-                  if (added) {
-                    const filtered = field.value.filter(
-                      (value) => value.id !== added.id
-                    );
-                    form.setValue('roles', [...filtered], {
-                      shouldDirty: true,
-                    });
-                  } else {
-                    form.setValue('roles', [...field.value, role], {
-                      shouldDirty: true,
-                    });
-                  }
-                }}
+                  form.setValue('roles', [...filtered], {
+                    shouldDirty: true,
+                  });
+                } else {
+                  form.setValue('roles', [...field.value, role.id], {
+                    shouldDirty: true,
+                  });
+                }
+              }}
+            >
+              <Check
+                className={cn(
+                  'mr-2 h-4 w-4',
+                  field.value.find((value) => value === role.id)
+                    ? 'opacity-100'
+                    : 'opacity-0'
+                )}
+              />
+              <Badge
+                key={role.id}
+                style={{ backgroundColor: `#${role.color}` }}
               >
-                <Check
-                  className={cn(
-                    'mr-2 h-4 w-4',
-                    field.value.find((value) => value.id === role.id)
-                      ? 'opacity-100'
-                      : 'opacity-0'
-                  )}
-                />
-                <Badge
-                  key={role.id}
-                  style={{ backgroundColor: `#${role.color}` }}
-                >
-                  {role.name}
-                </Badge>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
-};
+                {role.name}
+              </Badge>
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </Command>
+    </PopoverContent>
+  </Popover>
+);

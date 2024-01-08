@@ -4,7 +4,7 @@ import { ShortRole } from './discord.server';
 
 type RoleGroups = {
   readonly guildRoles: ShortRole[];
-  adminRoles: ShortRole[];
+  adminRolesIds: string[];
 };
 
 // Gets the server's admin roles
@@ -17,7 +17,7 @@ export const getAdminRoles = async (serverId: string): Promise<RoleGroups> => {
   });
 
   if (!config) {
-    return { guildRoles: [], adminRoles: [] };
+    return { guildRoles: [], adminRolesIds: [] };
   }
 
   const guildRoles = config.roles.map((role) => ({
@@ -27,9 +27,13 @@ export const getAdminRoles = async (serverId: string): Promise<RoleGroups> => {
     type: role.type,
   }));
 
-  const adminRoles = guildRoles.filter(
-    (role) => role.type === RoleType.ADMINISTRATOR
-  );
+  const adminRolesIds = guildRoles.reduce((a: string[], role) => {
+    if (role.type !== RoleType.ADMINISTRATOR) {
+      return a;
+    }
+    a.push(role.id);
+    return a;
+  }, []);
 
-  return { guildRoles, adminRoles };
+  return { guildRoles, adminRolesIds };
 };
