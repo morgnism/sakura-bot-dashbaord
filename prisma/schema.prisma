@@ -103,6 +103,7 @@ model ModerationConfig {
 }
 
 enum RoleAction {
+  DEFAULT
   ADD
   REMOVE
 }
@@ -117,7 +118,7 @@ model Role {
   id                      BigInt            @id
   name                    String
   color                   Int
-  action                  RoleAction        @default(ADD)
+  action                  RoleAction        @default(DEFAULT)
   delay                   BigInt            @default(0)
   type                    RoleType          @default(DEFAULT)
   protected               Boolean           @default(false)
