@@ -1,9 +1,9 @@
-import { RoleType, type GuildConfig, type Prisma } from '@prisma/client';
+import { Channels, GuildConfig, Prisma, RoleType } from '@prisma/client';
 import { FeatureKeys } from '~/lib/features';
-import { hexToDecimal } from '~/utils/hex-to-decimal';
 import { bigintSerializer } from '~/utils/serializer';
 import db from './db.server';
 import {
+  GuildChannelTypes,
   ShortRole,
   fetchGuildChannels,
   fetchGuildRoles,
@@ -15,6 +15,10 @@ export const DEFAULT_ROLE = '@everyone';
 
 type GuildSettings = Omit<GuildConfig, 'id'> & { id: string };
 
+type GuildChannel = Omit<Channels, 'id'> & { id: string };
+
+type ShortGuildChannel = { id: string; name: string };
+
 export type EnabledFeatures = {
   [feature: string]: boolean;
 };
@@ -23,7 +27,13 @@ type UpdateGuildConfigMutation = EnabledFeatures;
 
 type UpdateSettingsMutation = {
   prefix: string;
-  roles: ShortRole[];
+  roles: string[];
+  updatesChannel: string;
+};
+
+type ChannelGroups = {
+  readonly guildChannels: ShortGuildChannel[];
+  selectedChannelId: string;
 };
 
 export const activateGuild = async (serverId: string) => {
@@ -101,6 +111,10 @@ export const setInitialChannels = async (serverId: string) => {
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const channels = guildChannels.reduce(
     (a: Prisma.ChannelsCreateManyGuildInput[], channel) => {
+      if (channel.type !== GuildChannelTypes.GUILD_TEXT) {
+        return a;
+      }
+
       a.push({
         id: BigInt(channel.id),
         name: channel.name,
@@ -189,25 +203,53 @@ export const getServerSettings = async (serverId: string) => {
   return JSON.parse(serialize) as GuildSettings;
 };
 
+// Gets the server's saved channels
+export const getServerChannels = async (
+  serverId: string
+): Promise<ChannelGroups> => {
+  console.log(`Loading channels for Guild (${serverId})`);
+  const guildId: GuildConfig['id'] = BigInt(serverId);
+  const channels = await db.channels.findMany({
+    where: { guildId },
+  });
+
+  if (!channels) {
+    return { guildChannels: [], selectedChannelId: '' };
+  }
+
+  const guildChannels = channels.map((channel) => ({
+    id: String(channel.id),
+    name: channel.name,
+  }));
+
+  const selectedChannelId = String(
+    channels.find((channel) => channel.isUpdatesChannel)?.id
+  );
+
+  return { guildChannels, selectedChannelId };
+};
+
 export const updateServerSettings = async (
   serverId: string,
   updates: UpdateSettingsMutation
 ) => {
   console.log(`Updating server settings...`);
   const guildId: GuildConfig['id'] = BigInt(serverId);
-  const { prefix, roles } = updates;
-  const rolesInputs: Prisma.RoleUpdateManyWithWhereWithoutRoleConfigInput[] =
-    roles.map(({ id, ...role }) => ({
-      where: { id: BigInt(id) },
+  const { prefix, roles, updatesChannel: updatesChannelId } = updates;
+  const rolesUpdateManyInputs: Prisma.RoleUpdateManyWithWhereWithoutRoleConfigInput[] =
+    roles.map((id) => ({
+      where: { id: BigInt(id), type: RoleType.DEFAULT },
       data: {
-        ...role,
-        color: hexToDecimal(role.color),
-        type: role.type as RoleType,
-        protected: role.type === RoleType.ADMINISTRATOR,
+        type: RoleType.ADMINISTRATOR,
+        protected: true,
       },
     }));
 
-  return await db.guildConfig.update({
+  const rolesWhereNotInputs: Prisma.RoleScalarWhereInput[] = roles.map(
+    (id) => ({ id: BigInt(id), type: RoleType.ADMINISTRATOR })
+  );
+
+  const result = await db.guildConfig.update({
     where: { id: guildId },
     data: {
       prefix,
@@ -216,11 +258,46 @@ export const updateServerSettings = async (
           where: { guildId },
           data: {
             roles: {
-              updateMany: rolesInputs,
+              updateMany: [
+                ...rolesUpdateManyInputs,
+                {
+                  where: { NOT: rolesWhereNotInputs },
+                  data: {
+                    type: RoleType.DEFAULT,
+                    protected: false,
+                  },
+                },
+              ],
             },
           },
         },
       },
+      channels: {
+        updateMany: [
+          {
+            where: { id: BigInt(updatesChannelId) },
+            data: { isUpdatesChannel: true },
+          },
+          {
+            where: { NOT: { id: BigInt(updatesChannelId) } },
+            data: { isUpdatesChannel: false },
+          },
+        ],
+      },
+    },
+    select: {
+      id: true,
+      prefix: true,
+      roleConfig: { select: { roles: true } },
+      channels: true,
     },
   });
+
+  const serialize = JSON.stringify(result, bigintSerializer);
+  return JSON.parse(serialize) as {
+    id: string;
+    prefix: string;
+    roleConfig: { roles: ShortRole[] };
+    channels: GuildChannel[];
+  };
 };
