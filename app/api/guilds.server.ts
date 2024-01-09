@@ -31,6 +31,13 @@ type UpdateSettingsMutation = {
   updatesChannel: string;
 };
 
+type SavedSettingsMutation = {
+  id: string;
+  prefix: string;
+  roleConfig: { roles: ShortRole[] };
+  channels: GuildChannel[];
+};
+
 type ChannelGroups = {
   readonly guildChannels: ShortGuildChannel[];
   selectedChannelId: string;
@@ -294,10 +301,5 @@ export const updateServerSettings = async (
   });
 
   const serialize = JSON.stringify(result, bigintSerializer);
-  return JSON.parse(serialize) as {
-    id: string;
-    prefix: string;
-    roleConfig: { roles: ShortRole[] };
-    channels: GuildChannel[];
-  };
+  return JSON.parse(serialize) as SavedSettingsMutation;
 };

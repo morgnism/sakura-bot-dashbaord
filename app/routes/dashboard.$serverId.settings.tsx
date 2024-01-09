@@ -1,8 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RoleType } from '@prisma/client';
 import { ActionFunctionArgs } from '@remix-run/node';
-import { Form as RemixForm, useLoaderData, useSubmit } from '@remix-run/react';
+import {
+  Form as RemixForm,
+  useActionData,
+  useLoaderData,
+  useSubmit,
+} from '@remix-run/react';
 import { Check, ChevronsUpDown } from 'lucide-react';
+import { useEffect } from 'react';
 import { ControllerRenderProps, UseFormReturn, useForm } from 'react-hook-form';
 import { LoaderFunctionArgs } from 'react-router';
 import invariant from 'tiny-invariant';
@@ -88,10 +94,11 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   try {
     const result = settingsFormSchema.parse(payload);
-    return await updateServerSettings(params.serverId, result);
+    const data = await updateServerSettings(params.serverId, result);
+    return { success: true, data };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: error.flatten() };
+      return { success: false, data: [], error: error.flatten() };
     }
     return { error };
   }
@@ -116,6 +123,14 @@ export default function GuildSettingsPage() {
     },
   });
   const submit = useSubmit();
+  const submittedData = useActionData<typeof action>();
+
+  useEffect(() => {
+    if (form.formState.isSubmitSuccessful && submittedData) {
+      // update defaultValues to save input fields
+      form.reset(form.getValues());
+    }
+  }, [form.formState, submittedData, form.reset]);
 
   const onSubmit = (data: SettingsFormData) => {
     const roles = JSON.stringify(data.roles);
