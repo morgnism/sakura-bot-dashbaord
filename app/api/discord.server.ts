@@ -1,3 +1,4 @@
+import { RoleAction } from '@prisma/client';
 import { PartialDiscordGuild } from 'remix-auth-socials';
 import { DISCORD_TOKEN } from '../lib/config';
 import { DISCORD_BASE_URL } from '../lib/constants';
@@ -46,6 +47,14 @@ export type GuildRole = {
   permissions: string;
   position: number;
   unicode_emoji: string | null;
+};
+
+export type AutoRole = {
+  id: string;
+  name: string;
+  color: string;
+  action: RoleAction;
+  delay: number;
 };
 
 export type ShortRole = {
