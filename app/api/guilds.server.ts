@@ -86,7 +86,7 @@ export const initiateFeatures = async (serverId: string) => {
 };
 
 export const setInitialRoles = async (serverId: string) => {
-  console.log(`Setting guild roles...`);
+  console.log('Setting guild roles...');
   const guildRoles = await fetchGuildRoles(serverId);
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const roles = guildRoles.reduce((a: Prisma.RoleCreateManyInput[], role) => {
@@ -113,7 +113,7 @@ export const setInitialRoles = async (serverId: string) => {
 };
 
 export const setInitialChannels = async (serverId: string) => {
-  console.log(`Setting guild channels...`);
+  console.log('Setting guild channels...');
   const guildChannels = await fetchGuildChannels(serverId);
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const channels = guildChannels.reduce(
@@ -146,7 +146,7 @@ export const setInitialChannels = async (serverId: string) => {
 
 // Gets all the configs for a guild with their enabled status
 export const getActiveFeatures = async (serverId: string) => {
-  console.log(`Loading active features...`);
+  console.log('Loading active features...');
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const select = Object.values(FeatureKeys).reduce(
     (a: Prisma.GuildConfigInclude, module) => ({
@@ -169,7 +169,7 @@ export const updateFeatureStatus = async (
   serverId: string,
   updates: UpdateGuildConfigMutation
 ) => {
-  console.log(`Updating active feature status...`);
+  console.log('Updating active feature status...');
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const guildUpdates = Object.entries(updates).reduce(
     (a, [name, enabled]) => {
@@ -240,7 +240,7 @@ export const updateServerSettings = async (
   serverId: string,
   updates: UpdateSettingsMutation
 ) => {
-  console.log(`Updating server settings...`);
+  console.log('Updating server settings...');
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const { prefix, roles, updatesChannel: updatesChannelId } = updates;
   const rolesUpdateManyInputs: Prisma.RoleUpdateManyWithWhereWithoutRoleConfigInput[] =

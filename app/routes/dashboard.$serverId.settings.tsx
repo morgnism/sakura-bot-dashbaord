@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { RoleType } from '@prisma/client';
 import { ActionFunctionArgs } from '@remix-run/node';
 import {
   Form as RemixForm,
@@ -98,9 +97,9 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     return { success: true, data };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, data: [], error: error.flatten() };
+      return { success: false, data: null, error: error.flatten() };
     }
-    return { error };
+    return { success: false, data: null, error };
   }
 };
 
@@ -126,7 +125,11 @@ export default function GuildSettingsPage() {
   const submittedData = useActionData<typeof action>();
 
   useEffect(() => {
-    if (form.formState.isSubmitSuccessful && submittedData) {
+    if (
+      form.formState.isSubmitSuccessful &&
+      submittedData &&
+      submittedData.success
+    ) {
       // update defaultValues to save input fields
       form.reset(form.getValues());
     }
