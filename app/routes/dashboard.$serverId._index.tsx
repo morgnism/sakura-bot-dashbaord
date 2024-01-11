@@ -132,9 +132,14 @@ export default function DashboardServerHomePage() {
   };
 
   return (
-    <>
-      <div>
-        <h3 className="mb-4 text-lg font-medium">DashboardServerHomePage</h3>
+    <div className="grid gap-6">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold tracking-tight">Sakura Modules</h2>
+        </div>
+        <p className="text-zinc-400">
+          Activate the features you need for your bot.
+        </p>
       </div>
       <Form {...form}>
         <fetcher.Form onSubmit={form.handleSubmit(onSubmit)}>
@@ -171,6 +176,6 @@ export default function DashboardServerHomePage() {
           </div>
         </fetcher.Form>
       </Form>
-    </>
+    </div>
   );
 }
