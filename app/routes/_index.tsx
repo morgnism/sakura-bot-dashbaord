@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
 import { Link } from '@remix-run/react';
-import MainLayout from '~/components/Wrappers/MainLayout';
+import MainLayout from '~/components/MainLayout';
 import { authenticator } from '~/server/auth.server';
 
 export const meta: MetaFunction = () => {
