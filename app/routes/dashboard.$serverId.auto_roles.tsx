@@ -189,7 +189,7 @@ export default function AutoRolePage() {
                   name="roles"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Auto Roles</FormLabel>
+                      <FormLabel>Roles List</FormLabel>
                       <FormDescription>
                         The role to assign to new members or remove from
                         existing members. Use a delay time in minutes.
