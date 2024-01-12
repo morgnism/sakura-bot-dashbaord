@@ -7,9 +7,9 @@ import {
   useLoaderData,
   useSubmit,
 } from '@remix-run/react';
-import { Check, ChevronsUpDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { UseFormReturn, useForm } from 'react-hook-form';
+import { Check, ChevronsUpDown, XCircle } from 'lucide-react';
+import { useCallback, useEffect } from 'react';
+import { UseFormReturn, useFieldArray, useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
 import { AutoRole } from '~/api/discord.server';
@@ -18,8 +18,6 @@ import {
   getAllRoles,
   saveAutoRole,
 } from '~/api/roles.server';
-import DataTable from '~/components/DataTable';
-import { AutoRoleColumns } from '~/components/DataTable/Columns';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
@@ -39,34 +37,61 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover';
-import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group';
 import { cn } from '~/utils/cn';
 import { titleCase } from '~/utils/title-case';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.serverId, 'Missing serverId param');
-  const { allRoles, autoRoles } = await getAllRoles(params.serverId);
+  const allRoles = await getAllRoles(params.serverId);
+  const autoRoles = allRoles.reduce((a: NonDefaultAutoRole[], role) => {
+    if (role.action !== RoleAction.DEFAULT && typeof role.delay === 'number') {
+      a.push({
+        role: role.id,
+        action: role.action,
+        delay: role.delay,
+      });
+    }
+    return a;
+  }, []);
   return { allRoles, autoRoles };
 };
 
 const RoleActionState: [string, string] = [RoleAction.ADD, RoleAction.REMOVE];
 
 const autorolesFormSchema = z.object({
-  role: z.string(), // role id
-  action: z.enum(RoleActionState),
-  delay: z.number(),
+  roles: z.array(
+    z.object({
+      role: z.string(), // role id
+      action: z.enum(RoleActionState),
+      delay: z.number(),
+    })
+  ),
 });
 
 type AutorolesFormData = z.infer<typeof autorolesFormSchema>;
 
+const defaultInitialValue = { role: '', action: 'ADD', delay: 0 };
+const prepareDefaultValues = (roles?: NonDefaultAutoRole[]) => {
+  if (roles && roles.length) {
+    return { roles };
+  }
+  return { roles: [defaultInitialValue] };
+};
+
+const RoleActionStates = [
+  { value: RoleAction.ADD, label: titleCase(RoleAction.ADD) },
+  { value: RoleAction.REMOVE, label: titleCase(RoleAction.REMOVE) },
+];
+
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   invariant(params.serverId, 'Missing serverId param');
   const formData = await request.formData();
-  const formEntries = Object.fromEntries(formData.entries());
-  const payload = {
-    ...formEntries,
-    delay: Number(formEntries.delay),
-  };
+  const payload = Object.fromEntries(formData.entries());
+
+  // FormData values are passed stringified
+  if (typeof payload.roles === 'string') {
+    payload.roles = JSON.parse(payload.roles);
+  }
 
   try {
     const result = autorolesFormSchema.parse(payload);
@@ -74,9 +99,9 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     return { success: true, data };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, data: [], error: error.flatten() };
+      return { success: false, data: { roles: [] }, error: error.flatten() };
     }
-    return { success: false, data: [], error };
+    return { success: false, data: { roles: [] }, error };
   }
 };
 
@@ -84,12 +109,14 @@ export default function AutoRolePage() {
   const { allRoles, autoRoles } = useLoaderData<typeof loader>();
   const form = useForm<AutorolesFormData>({
     resolver: zodResolver(autorolesFormSchema),
-    defaultValues: {
-      role: '',
-      action: RoleAction.ADD,
-      delay: 0,
-    },
+    defaultValues: prepareDefaultValues(autoRoles),
   });
+
+  const { fields, append, remove } = useFieldArray({
+    name: 'roles',
+    control: form.control,
+  });
+
   const submit = useSubmit();
   const submittedData = useActionData<typeof action>();
 
@@ -100,12 +127,26 @@ export default function AutoRolePage() {
       submittedData.success
     ) {
       // update defaultValues to save input fields
-      form.reset({ ...form.getValues(), role: '' });
+      form.reset(form.getValues());
     }
-  }, [form.formState, submittedData, form.reset]);
+  }, [form.reset, submittedData]);
 
   const onSubmit = (data: AutorolesFormData) => {
-    submit(data, { method: 'post' });
+    const roles = JSON.stringify(data.roles);
+    submit({ roles }, { method: 'post' });
+  };
+
+  const handleAddInput = () => {
+    append(defaultInitialValue);
+  };
+
+  const handleResetInput = (index: number) => {
+    if (index === 0) {
+      remove(index);
+      handleAddInput();
+    } else {
+      remove(index);
+    }
   };
 
   return (
@@ -120,7 +161,7 @@ export default function AutoRolePage() {
       </div>
 
       {/* TODO: delete after prod release */}
-      <pre className="rounded-md bg-zinc-800 p-4">
+      {/* <pre className="rounded-md bg-zinc-800 p-4">
         <code className="text-white">
           {JSON.stringify(
             { autoRoles, isDirty: form.formState.isDirty },
@@ -128,9 +169,9 @@ export default function AutoRolePage() {
             2
           )}
         </code>
-      </pre>
+      </pre> */}
 
-      <div className="grid w-full sm:grid-cols-2 grid-cols-1 gap-10">
+      <div>
         <Form {...form}>
           <RemixForm
             onSubmit={form.handleSubmit(onSubmit)}
@@ -138,62 +179,74 @@ export default function AutoRolePage() {
           >
             <Card>
               <CardContent className="pt-6 border-zinc-800 grid gap-6">
-                <ComboBoxRoleField form={form} values={allRoles} />
                 <FormField
                   control={form.control}
-                  name="delay"
+                  name="roles"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Time Delay</FormLabel>
-                      <FormControl>
-                        <Input placeholder="0" {...field} />
-                      </FormControl>
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Auto Roles</FormLabel>
                       <FormDescription>
-                        Delay to add the role in minutes.
+                        The role to assign to new members or remove from
+                        existing members. Use a delay time in minutes.
+                        <br />
+                        Note: 0 minutes will apply the role immediately.
                       </FormDescription>
+                      <div className="grid gap-2">
+                        {fields.map((field, i) => (
+                          <div
+                            key={field.id}
+                            className="grid grid-cols-3 gap-6"
+                          >
+                            <ComboBoxRoleField
+                              form={form}
+                              values={allRoles}
+                              index={i}
+                            />
+                            <ComboBoxRoleActionField form={form} index={i} />
+                            <div className="flex justify-between">
+                              <FormField
+                                control={form.control}
+                                name={`roles.${i}.delay`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Input placeholder="0" {...field} />
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                className="rounded-full"
+                                onClick={() => handleResetInput(i)}
+                              >
+                                <XCircle className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                       <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="action"
-                  render={({ field }) => (
-                    <FormItem className="space-y-3">
-                      <FormLabel>Autorole action</FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          className="flex flex-col space-y-1"
-                        >
-                          {RoleActionState.map((action) => (
-                            <FormItem
-                              key={action}
-                              className="flex items-center space-x-3 space-y-0"
-                            >
-                              <FormControl>
-                                <RadioGroupItem value={action} />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                {titleCase(action)}
-                              </FormLabel>
-                            </FormItem>
-                          ))}
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="mt-2"
+                        onClick={() => append(defaultInitialValue)}
+                      >
+                        Add Role
+                      </Button>
                     </FormItem>
                   )}
                 />
                 <Button disabled={!form.formState.isDirty} type="submit">
-                  Add to Auto Roles
+                  Save Auto Roles
                 </Button>
               </CardContent>
             </Card>
           </RemixForm>
         </Form>
-        <DataTable columns={AutoRoleColumns} data={autoRoles} />
       </div>
     </div>
   );
@@ -202,18 +255,18 @@ export default function AutoRolePage() {
 type ComboBoxRoleFieldProps = {
   form: UseFormReturn<AutorolesFormData, any, undefined>;
   values: AutoRole[];
+  index: number;
 };
 
-const ComboBoxRoleField = ({ form, values }: ComboBoxRoleFieldProps) => (
+const ComboBoxRoleField = ({ form, values, index }: ComboBoxRoleFieldProps) => (
   <FormField
     control={form.control}
-    name="role"
+    name={`roles.${index}.role`}
     render={({ field }) => {
       const value = values.find((role) => role.id === field.value);
 
       return (
         <FormItem className="flex flex-col">
-          <FormLabel>Available Roles</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>
@@ -228,7 +281,6 @@ const ComboBoxRoleField = ({ form, values }: ComboBoxRoleFieldProps) => (
                   <div className="flex gap-2 flex-wrap">
                     {field.value ? (
                       <Badge
-                        key={value?.id}
                         style={{
                           backgroundColor: `#${value?.color}`,
                         }}
@@ -251,7 +303,7 @@ const ComboBoxRoleField = ({ form, values }: ComboBoxRoleFieldProps) => (
                       value={role.name}
                       key={role.id}
                       onSelect={() => {
-                        form.setValue('role', role.id, {
+                        form.setValue(`roles.${index}.role`, role.id, {
                           shouldDirty: true,
                         });
                       }}
@@ -263,7 +315,6 @@ const ComboBoxRoleField = ({ form, values }: ComboBoxRoleFieldProps) => (
                         )}
                       />
                       <Badge
-                        key={role.id}
                         style={{
                           backgroundColor: `#${role.color}`,
                         }}
@@ -276,10 +327,77 @@ const ComboBoxRoleField = ({ form, values }: ComboBoxRoleFieldProps) => (
               </Command>
             </PopoverContent>
           </Popover>
-          <FormDescription>
-            The role to assigned/removed to members.
-          </FormDescription>
-          <FormMessage />
+        </FormItem>
+      );
+    }}
+  />
+);
+
+type ComboBoxRoleActionFieldProps = {
+  form: UseFormReturn<AutorolesFormData, any, undefined>;
+  index: number;
+};
+
+const ComboBoxRoleActionField = ({
+  form,
+  index,
+}: ComboBoxRoleActionFieldProps) => (
+  <FormField
+    control={form.control}
+    name={`roles.${index}.action`}
+    render={({ field }) => {
+      const label = RoleActionStates.find(
+        (action) => action.value === field.value
+      )?.label;
+
+      return (
+        <FormItem className="flex flex-col">
+          <Popover>
+            <PopoverTrigger asChild>
+              <FormControl>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className={cn(
+                    'justify-between h-[unset] min-h-10',
+                    !field.value && 'text-muted-foreground'
+                  )}
+                >
+                  <div className="flex gap-2 flex-wrap">
+                    {field.value ? <Badge>{label}</Badge> : 'Select a role'}
+                  </div>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </FormControl>
+            </PopoverTrigger>
+            <PopoverContent className="min-w-96 p-0">
+              <Command>
+                <CommandGroup>
+                  {RoleActionStates.map((action) => (
+                    <CommandItem
+                      value={action.label}
+                      key={action.value}
+                      onSelect={() => {
+                        form.setValue(`roles.${index}.action`, action.value, {
+                          shouldDirty: true,
+                        });
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          action.value === field.value
+                            ? 'opacity-100'
+                            : 'opacity-0'
+                        )}
+                      />
+                      <Badge>{action.label}</Badge>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </FormItem>
       );
     }}
