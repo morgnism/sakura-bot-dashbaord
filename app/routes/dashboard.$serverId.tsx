@@ -1,9 +1,11 @@
 import { NavLink, Outlet } from '@remix-run/react';
 import {
   BadgePlus,
-  DoorClosed,
   DoorOpen,
+  Hash,
   LayoutDashboard,
+  PieChart,
+  ScrollText,
   Settings,
   Shield,
 } from 'lucide-react';
@@ -20,13 +22,13 @@ export const MAIN_SIDEBAR_MENU = [
 const SERVER_MANAGEMENT_SIDEBAR_MENU = [
   {
     to: `.${AppRoutes.WELCOME}`,
-    label: 'Welcome',
-    Icon: DoorOpen,
+    label: 'Welcome Channel',
+    Icon: Hash,
   },
   {
-    to: `.${AppRoutes.LEAVE}`,
-    label: 'Goodbye',
-    Icon: DoorClosed,
+    to: `.${AppRoutes.GREETING}`,
+    label: 'Welcome and Goodbye',
+    Icon: DoorOpen,
   },
   {
     to: `.${AppRoutes.AUTO_ROLES}`,
@@ -37,6 +39,19 @@ const SERVER_MANAGEMENT_SIDEBAR_MENU = [
     to: `.${AppRoutes.MODERATOR}`,
     label: 'Moderator',
     Icon: Shield,
+  },
+];
+
+export const MONITORING = [
+  {
+    to: `.${AppRoutes.BAN_ANALYTICS}`,
+    label: 'Ban Analytics',
+    Icon: PieChart,
+  },
+  {
+    to: `.${AppRoutes.LOGS}`,
+    label: 'Logs',
+    Icon: ScrollText,
   },
 ];
 
@@ -62,6 +77,12 @@ export default function DashboardServerLayout() {
                   menu={SERVER_MANAGEMENT_SIDEBAR_MENU}
                   className="mt-2"
                 />
+              </li>
+              <li>
+                <div className="text-xs font-semibold leading-6 text-[#9ca3af]">
+                  Monitoring
+                </div>
+                <SidebarMenu menu={MONITORING} className="mt-2" />
               </li>
             </ul>
           </nav>

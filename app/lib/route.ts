@@ -3,9 +3,11 @@ export const enum AppRoutes {
   AUTH = '/auth',
   LOGIN = '/login',
   DASHBOARD = '/dashboard',
-  WELCOME = '/welcome',
-  LEAVE = '/leave',
+  WELCOME = '/welcome_channel',
+  GREETING = '/greetings',
   AUTO_ROLES = '/auto_roles',
   MODERATOR = '/moderator',
   SETTINGS = '/settings',
+  BAN_ANALYTICS = '/bans',
+  LOGS = '/logs',
 }

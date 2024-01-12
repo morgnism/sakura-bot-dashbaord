@@ -34,7 +34,7 @@ export const FeatureMap = new Map<string, Feature>([
   [
     FeatureKeys.LEAVE,
     {
-      to: `.${AppRoutes.LEAVE}`,
+      to: `.${AppRoutes.GREETING}`,
       label: 'Goodbye',
       description: 'Send a goodbye message to leaving members.',
       enabled: false,
