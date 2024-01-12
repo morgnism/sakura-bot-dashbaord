@@ -1,4 +1,4 @@
-enum ColorNames {
+export enum ColorNames {
   Default = 0,
   Aqua = 1752220,
   DarkAqua = 1146986,
@@ -52,7 +52,7 @@ export const ColorMap = new Map<ColorNames, string>([
   [ColorNames.Yellow, '#FFFF00'],
 ]);
 
-enum OfficialColorNames {
+export enum OfficialColorNames {
   Default = 16777215,
   Greyple = 10070709,
   Black = 2303786,

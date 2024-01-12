@@ -36,6 +36,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover';
+import { ColorMap, ColorNames } from '~/lib/color-map';
 import { cn } from '~/utils/cn';
 import { titleCase } from '~/utils/title-case';
 
@@ -84,8 +85,16 @@ const prepareDefaultValues = (roles?: NonDefaultAutoRole[]) => {
 };
 
 const RoleActionStates = [
-  { value: RoleAction.ADD, label: titleCase(RoleAction.ADD) },
-  { value: RoleAction.REMOVE, label: titleCase(RoleAction.REMOVE) },
+  {
+    value: RoleAction.ADD,
+    label: titleCase(RoleAction.ADD),
+    color: ColorMap.get(ColorNames.Green),
+  },
+  {
+    value: RoleAction.REMOVE,
+    label: titleCase(RoleAction.REMOVE),
+    color: ColorMap.get(ColorNames.Red),
+  },
 ];
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -351,9 +360,9 @@ const ComboBoxRoleActionField = ({
     control={form.control}
     name={`roles.${index}.action`}
     render={({ field }) => {
-      const label = RoleActionStates.find(
+      const action = RoleActionStates.find(
         (action) => action.value === field.value
-      )?.label;
+      );
 
       return (
         <FormItem className="flex flex-col">
@@ -369,7 +378,17 @@ const ComboBoxRoleActionField = ({
                   )}
                 >
                   <div className="flex gap-2 flex-wrap">
-                    {field.value ? <Badge>{label}</Badge> : 'Select a role'}
+                    {field.value
+                      ? action && (
+                          <Badge
+                            style={{
+                              backgroundColor: action.color,
+                            }}
+                          >
+                            {action.label}
+                          </Badge>
+                        )
+                      : 'Select a role'}
                   </div>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -396,7 +415,13 @@ const ComboBoxRoleActionField = ({
                             : 'opacity-0'
                         )}
                       />
-                      <Badge>{action.label}</Badge>
+                      <Badge
+                        style={{
+                          backgroundColor: action.color,
+                        }}
+                      >
+                        {action.label}
+                      </Badge>
                     </CommandItem>
                   ))}
                 </CommandGroup>
