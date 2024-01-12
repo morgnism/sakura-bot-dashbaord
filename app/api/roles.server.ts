@@ -1,8 +1,10 @@
-import { RoleAction, RoleType, type GuildConfig, Prisma } from '@prisma/client';
+import { Prisma, type GuildConfig } from '@prisma/client';
 import { decimalToHex } from '~/utils/hex-to-decimal';
 import { bigintSerializer } from '~/utils/serializer';
 import db from './db.server';
-import { AutoRole, ShortRole } from './discord.server';
+import { AutoRole, RoleAction, ShortRole } from './discord.server';
+
+export { RoleType } from '@prisma/client';
 
 export type ShortRoleAction = typeof RoleAction.ADD | typeof RoleAction.REMOVE;
 
@@ -46,9 +48,7 @@ export const getAllRoles = async (serverId: string): Promise<AutoRole[]> => {
 };
 
 // Gets the server's admin roles
-export const getAdminRoles = async (
-  serverId: string
-): Promise<AdminRoleGroups> => {
+export const getAdminRoles = async (serverId: string): Promise<ShortRole[]> => {
   console.log('Loading admin roles...');
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const config = await db.roleConfig.findUnique({
@@ -57,25 +57,15 @@ export const getAdminRoles = async (
   });
 
   if (!config) {
-    return { guildRoles: [], adminRolesIds: [] };
+    return [];
   }
 
-  const guildRoles = config.roles.map((role) => ({
+  return config.roles.map((role) => ({
     id: String(role.id),
     color: decimalToHex(role.color),
     name: role.name,
     type: role.type,
   }));
-
-  const adminRolesIds = guildRoles.reduce((a: string[], role) => {
-    if (role.type !== RoleType.ADMINISTRATOR) {
-      return a;
-    }
-    a.push(role.id);
-    return a;
-  }, []);
-
-  return { guildRoles, adminRolesIds };
 };
 
 export const saveAutoRole = async (

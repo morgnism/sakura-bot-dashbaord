@@ -3,6 +3,8 @@ import { PartialDiscordGuild } from 'remix-auth-socials';
 import { DISCORD_TOKEN } from '../lib/config';
 import { DISCORD_BASE_URL } from '../lib/constants';
 
+export { RoleAction } from '@prisma/client';
+
 export enum GuildChannelTypes {
   GUILD_TEXT = 0,
   DM = 1,

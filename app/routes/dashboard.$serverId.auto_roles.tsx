@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { RoleAction } from '@prisma/client';
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import {
   Form as RemixForm,
@@ -8,11 +7,11 @@ import {
   useSubmit,
 } from '@remix-run/react';
 import { Check, ChevronsUpDown, XCircle } from 'lucide-react';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { UseFormReturn, useFieldArray, useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
-import { AutoRole } from '~/api/discord.server';
+import { AutoRole, RoleAction } from '~/api/discord.server';
 import {
   NonDefaultAutoRole,
   getAllRoles,
