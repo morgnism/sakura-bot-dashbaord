@@ -1,4 +1,4 @@
-import { RoleAction, RoleType, type GuildConfig } from '@prisma/client';
+import { RoleAction, RoleType, type GuildConfig, Prisma } from '@prisma/client';
 import { decimalToHex } from '~/utils/hex-to-decimal';
 import { bigintSerializer } from '~/utils/serializer';
 import db from './db.server';
@@ -6,19 +6,14 @@ import { AutoRole, ShortRole } from './discord.server';
 
 export type ShortRoleAction = typeof RoleAction.ADD | typeof RoleAction.REMOVE;
 
-export type NonDefaultAutoRole = Omit<AutoRole, 'action'> & {
-  action?: ShortRoleAction;
-};
-
-type AutoRoleGroups = {
-  readonly allRoles: AutoRole[];
-  autoRoles: NonDefaultAutoRole[];
-};
-
-type UpdateAutoRoleMutation = {
+export type NonDefaultAutoRole = {
   role: string;
   action: string;
   delay: number;
+};
+
+type UpdateAutoRoleMutation = {
+  roles: NonDefaultAutoRole[];
 };
 
 type AdminRoleGroups = {
@@ -26,9 +21,7 @@ type AdminRoleGroups = {
   adminRolesIds: string[];
 };
 
-export const getAllRoles = async (
-  serverId: string
-): Promise<AutoRoleGroups> => {
+export const getAllRoles = async (serverId: string): Promise<AutoRole[]> => {
   console.log('Loading all saved roles...');
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const config = await db.roleConfig.findUnique({
@@ -37,10 +30,10 @@ export const getAllRoles = async (
   });
 
   if (!config) {
-    return { allRoles: [], autoRoles: [] };
+    return [];
   }
 
-  const allRoles = config.roles.reduce((a: AutoRole[], role) => {
+  return config.roles.reduce((a: AutoRole[], role) => {
     a.push({
       id: String(role.id),
       name: role.name,
@@ -50,18 +43,6 @@ export const getAllRoles = async (
     });
     return a;
   }, []);
-
-  const autoRoles = allRoles.reduce((a: NonDefaultAutoRole[], role) => {
-    if (role.action !== RoleAction.DEFAULT && typeof role.delay === 'number') {
-      a.push({
-        ...role,
-        action: role.action,
-      });
-    }
-    return a;
-  }, []);
-
-  return { allRoles, autoRoles };
 };
 
 // Gets the server's admin roles
@@ -103,29 +84,64 @@ export const saveAutoRole = async (
 ) => {
   console.log('Saving auto roles...');
   const guildId: GuildConfig['id'] = BigInt(serverId);
-  const { role, delay } = updates;
-  const action =
-    updates.action === RoleAction.ADD ? RoleAction.ADD : RoleAction.REMOVE;
-  const id = BigInt(role);
+  const rolesWhereUpdateManyInputs = updates.roles.reduce(
+    (
+      a: Prisma.RoleUpdateManyWithWhereWithoutRoleConfigInput[],
+      { role, action, delay }
+    ) => {
+      if (!role) {
+        a.push({
+          where: {
+            OR: [{ action: RoleAction.ADD }, { action: RoleAction.REMOVE }],
+          },
+          data: { action: RoleAction.DEFAULT, delay: null },
+        });
+
+        return a;
+      }
+
+      const id = BigInt(role);
+
+      if (action === RoleAction.ADD) {
+        a.push({
+          where: { id },
+          data: { action: RoleAction.ADD, delay },
+        });
+      }
+
+      if (action === RoleAction.REMOVE) {
+        a.push({
+          where: { id },
+          data: { action: RoleAction.REMOVE, delay },
+        });
+      }
+
+      return a;
+    },
+    []
+  );
 
   const result = await db.roleConfig.update({
     where: { guildId },
     data: {
       roles: {
-        update: {
-          where: { id },
-          data: { action, delay },
-        },
+        updateMany: rolesWhereUpdateManyInputs,
       },
     },
     select: {
       roles: {
-        where: { id },
-        select: { id: true, name: true, action: true, delay: true },
+        where: { delay: { gte: 0 } },
+        select: { id: true, action: true, delay: true },
       },
     },
   });
 
-  const serialize = JSON.stringify(result, bigintSerializer);
+  const roles = result.roles.map((role) => ({
+    role: role.id,
+    action: role.action,
+    delay: role.delay,
+  }));
+
+  const serialize = JSON.stringify(roles, bigintSerializer);
   return JSON.parse(serialize) as UpdateAutoRoleMutation;
 };
