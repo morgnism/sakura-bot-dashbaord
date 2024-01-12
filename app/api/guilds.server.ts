@@ -17,7 +17,11 @@ type GuildSettings = Omit<GuildConfig, 'id'> & { id: string };
 
 type GuildChannel = Omit<Channels, 'id'> & { id: string };
 
-type ShortGuildChannel = { id: string; name: string };
+type ShortGuildChannel = {
+  id: string;
+  name: string;
+  isUpdatesChannel: boolean;
+};
 
 export type EnabledFeatures = {
   [feature: string]: boolean;
@@ -36,11 +40,6 @@ type SavedSettingsMutation = {
   prefix: string;
   roleConfig: { roles: ShortRole[] };
   channels: GuildChannel[];
-};
-
-type ChannelGroups = {
-  readonly guildChannels: ShortGuildChannel[];
-  selectedChannelId: string;
 };
 
 export const activateGuild = async (serverId: string) => {
@@ -213,7 +212,7 @@ export const getServerSettings = async (serverId: string) => {
 // Gets the server's saved channels
 export const getServerChannels = async (
   serverId: string
-): Promise<ChannelGroups> => {
+): Promise<ShortGuildChannel[]> => {
   console.log(`Loading channels for Guild (${serverId})`);
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const channels = await db.channels.findMany({
@@ -221,19 +220,14 @@ export const getServerChannels = async (
   });
 
   if (!channels) {
-    return { guildChannels: [], selectedChannelId: '' };
+    return [];
   }
 
-  const guildChannels = channels.map((channel) => ({
+  return channels.map((channel) => ({
     id: String(channel.id),
     name: channel.name,
+    isUpdatesChannel: channel.isUpdatesChannel,
   }));
-
-  const selectedChannelId = String(
-    channels.find((channel) => channel.isUpdatesChannel)?.id
-  );
-
-  return { guildChannels, selectedChannelId };
 };
 
 export const updateServerSettings = async (

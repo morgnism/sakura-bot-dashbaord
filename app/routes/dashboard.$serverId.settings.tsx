@@ -18,7 +18,7 @@ import {
   getServerSettings,
   updateServerSettings,
 } from '~/api/guilds.server';
-import { getAdminRoles } from '~/api/roles.server';
+import { RoleType, getAdminRoles } from '~/api/roles.server';
 import AccordionCard from '~/components/AccordionCard';
 import CopyButton from '~/components/CopyButton/CopyButton';
 import { Badge } from '~/components/ui/badge';
@@ -51,15 +51,22 @@ import { cn } from '~/utils/cn';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.serverId, 'Missing serverId param');
-  const [
-    settings,
-    { guildRoles, adminRolesIds },
-    { guildChannels, selectedChannelId },
-  ] = await Promise.all([
+  const [settings, guildRoles, guildChannels] = await Promise.all([
     getServerSettings(params.serverId),
     getAdminRoles(params.serverId),
     getServerChannels(params.serverId),
   ]);
+  const adminRolesIds = guildRoles.reduce((a: string[], role) => {
+    if (role.type !== RoleType.ADMINISTRATOR) {
+      return a;
+    }
+    a.push(role.id);
+    return a;
+  }, []);
+
+  const selectedChannelId = String(
+    guildChannels.find((channel) => channel.isUpdatesChannel)?.id
+  );
   return {
     settings,
     guildRoles,
