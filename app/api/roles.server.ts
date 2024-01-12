@@ -18,11 +18,6 @@ type UpdateAutoRoleMutation = {
   roles: NonDefaultAutoRole[];
 };
 
-type AdminRoleGroups = {
-  readonly guildRoles: ShortRole[];
-  adminRolesIds: string[];
-};
-
 export const getAllRoles = async (serverId: string): Promise<AutoRole[]> => {
   console.log('Loading all saved roles...');
   const guildId: GuildConfig['id'] = BigInt(serverId);

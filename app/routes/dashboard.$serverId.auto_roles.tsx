@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { UseFormReturn, useFieldArray, useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
-import { AutoRole, RoleAction } from '~/api/discord.server';
+import { AutoRole } from '~/api/discord.server';
 import {
   NonDefaultAutoRole,
   getAllRoles,
@@ -38,6 +38,12 @@ import {
 } from '~/components/ui/popover';
 import { cn } from '~/utils/cn';
 import { titleCase } from '~/utils/title-case';
+
+export const RoleAction = {
+  ADD: 'ADD',
+  REMOVE: 'REMOVE',
+  DEFAULT: 'DEFAULT',
+} as const;
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.serverId, 'Missing serverId param');

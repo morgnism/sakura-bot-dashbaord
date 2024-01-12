@@ -6,14 +6,15 @@ import {
   useLoaderData,
   useSubmit,
 } from '@remix-run/react';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, Hash } from 'lucide-react';
 import { useEffect } from 'react';
-import { ControllerRenderProps, UseFormReturn, useForm } from 'react-hook-form';
+import { UseFormReturn, useForm } from 'react-hook-form';
 import { LoaderFunctionArgs } from 'react-router';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
 import { ShortRole } from '~/api/discord.server';
 import {
+  ShortGuildChannel,
   getServerChannels,
   getServerSettings,
   updateServerSettings,
@@ -219,7 +220,7 @@ export default function GuildSettingsPage() {
             isOpenByDefault={true}
           >
             <div className="grid gap-2">
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="updatesChannel"
                 render={({ field }) => (
@@ -249,7 +250,8 @@ export default function GuildSettingsPage() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
+              <ComboBoxChannelsField form={form} values={guildChannels} />
             </div>
           </AccordionCard>
           {form.formState.isDirty && <Button type="submit">Save</Button>}
@@ -271,7 +273,80 @@ const ComboBoxRoleField = ({ form, values }: ComboBoxRoleFieldProps) => (
     render={({ field }) => (
       <FormItem className="flex flex-col">
         <FormLabel>Administrator Roles</FormLabel>
-        <ComboBoxRoleSelect form={form} values={values} field={field} />
+        <Popover>
+          <PopoverTrigger asChild>
+            <FormControl>
+              <Button
+                variant="outline"
+                role="combobox"
+                className={cn(
+                  'justify-between h-[unset] min-h-10',
+                  !field.value && 'text-muted-foreground'
+                )}
+              >
+                <div className="flex gap-2 flex-wrap">
+                  {field.value.length
+                    ? values
+                        .filter((role) => field.value.includes(role.id))
+                        .map((role) => (
+                          <Badge
+                            key={role.id}
+                            style={{ backgroundColor: `#${role.color}` }}
+                          >
+                            {role.name}
+                          </Badge>
+                        ))
+                    : 'Select a role'}
+                </div>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </FormControl>
+          </PopoverTrigger>
+          <PopoverContent className="min-w-96 p-0">
+            <Command>
+              <CommandGroup>
+                {values.map((role) => (
+                  <CommandItem
+                    value={role.name}
+                    key={role.id}
+                    onSelect={() => {
+                      const added = field.value.find(
+                        (value) => value === role.id
+                      );
+                      if (added) {
+                        const filtered = field.value.filter(
+                          (value) => value !== added
+                        );
+                        form.setValue('roles', [...filtered], {
+                          shouldDirty: true,
+                        });
+                      } else {
+                        form.setValue('roles', [...field.value, role.id], {
+                          shouldDirty: true,
+                        });
+                      }
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        field.value.find((value) => value === role.id)
+                          ? 'opacity-100'
+                          : 'opacity-0'
+                      )}
+                    />
+                    <Badge
+                      key={role.id}
+                      style={{ backgroundColor: `#${role.color}` }}
+                    >
+                      {role.name}
+                    </Badge>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </Command>
+          </PopoverContent>
+        </Popover>
         <FormDescription>
           These are the roles that will have bot admin permissions.
         </FormDescription>
@@ -281,87 +356,82 @@ const ComboBoxRoleField = ({ form, values }: ComboBoxRoleFieldProps) => (
   />
 );
 
-type ComboBoxRoleSelectProps = {
+type ComboBoxChannelsFieldProps = {
   form: UseFormReturn<SettingsFormData, any, undefined>;
-  field: ControllerRenderProps<SettingsFormData, 'roles'>;
-  values: ShortRole[];
+  values: ShortGuildChannel[];
 };
 
-const ComboBoxRoleSelect = ({
+const ComboBoxChannelsField = ({
   form,
-  field,
   values,
-}: ComboBoxRoleSelectProps) => (
-  <Popover>
-    <PopoverTrigger asChild>
-      <FormControl>
-        <Button
-          variant="outline"
-          role="combobox"
-          className={cn(
-            'justify-between h-[unset] min-h-10',
-            !field.value && 'text-muted-foreground'
-          )}
-        >
-          <div className="flex gap-2 flex-wrap">
-            {field.value.length
-              ? values
-                  .filter((role) => field.value.includes(role.id))
-                  .map((role) => (
-                    <Badge
-                      key={role.id}
-                      style={{ backgroundColor: `#${role.color}` }}
-                    >
-                      {role.name}
-                    </Badge>
-                  ))
-              : 'Select a role'}
-          </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </FormControl>
-    </PopoverTrigger>
-    <PopoverContent className="min-w-96 p-0">
-      <Command>
-        <CommandGroup>
-          {values.map((role) => (
-            <CommandItem
-              value={role.name}
-              key={role.id}
-              onSelect={() => {
-                const added = field.value.find((value) => value === role.id);
-                if (added) {
-                  const filtered = field.value.filter(
-                    (value) => value !== added
-                  );
-                  form.setValue('roles', [...filtered], {
-                    shouldDirty: true,
-                  });
-                } else {
-                  form.setValue('roles', [...field.value, role.id], {
-                    shouldDirty: true,
-                  });
-                }
-              }}
-            >
-              <Check
+}: ComboBoxChannelsFieldProps) => (
+  <FormField
+    control={form.control}
+    name="updatesChannel"
+    render={({ field }) => (
+      <FormItem className="flex flex-col">
+        <FormLabel>Administrator Roles</FormLabel>
+        <Popover>
+          <PopoverTrigger asChild>
+            <FormControl>
+              <Button
+                variant="outline"
+                role="combobox"
                 className={cn(
-                  'mr-2 h-4 w-4',
-                  field.value.find((value) => value === role.id)
-                    ? 'opacity-100'
-                    : 'opacity-0'
+                  'justify-between h-[unset] min-h-10',
+                  !field.value && 'text-muted-foreground'
                 )}
-              />
-              <Badge
-                key={role.id}
-                style={{ backgroundColor: `#${role.color}` }}
               >
-                {role.name}
-              </Badge>
-            </CommandItem>
-          ))}
-        </CommandGroup>
-      </Command>
-    </PopoverContent>
-  </Popover>
+                <div className="flex gap-2 flex-wrap">
+                  {field.value.length
+                    ? values
+                        .filter((channel) => field.value === channel.id)
+                        .map((channel) => (
+                          <div key={channel.id} className="flex items-center">
+                            <Hash className="h-4 w-4 mr-1" />
+                            {channel.name}
+                          </div>
+                        ))
+                    : 'Select a role'}
+                </div>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </FormControl>
+          </PopoverTrigger>
+          <PopoverContent className="min-w-96 p-0">
+            <Command>
+              <CommandGroup>
+                {values.map((channel) => (
+                  <CommandItem
+                    value={channel.name}
+                    key={channel.id}
+                    onSelect={() => {
+                      form.setValue('updatesChannel', channel.id, {
+                        shouldDirty: true,
+                      });
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        channel.id === field.value ? 'opacity-100' : 'opacity-0'
+                      )}
+                    />
+                    <div className="flex items-center">
+                      <Hash className="h-4 w-4 mr-1" />
+                      {channel.name}
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        <FormDescription>
+          These are the roles that will have bot admin permissions.
+        </FormDescription>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
 );

@@ -17,7 +17,7 @@ type GuildSettings = Omit<GuildConfig, 'id'> & { id: string };
 
 type GuildChannel = Omit<Channels, 'id'> & { id: string };
 
-type ShortGuildChannel = {
+export type ShortGuildChannel = {
   id: string;
   name: string;
   isUpdatesChannel: boolean;
