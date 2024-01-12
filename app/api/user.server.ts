@@ -1,6 +1,6 @@
 import type { DiscordUser, Prisma } from '@prisma/client';
 import { PartialDiscordGuild } from 'remix-auth-socials';
-import { FeatureKeys } from '~/lib/features';
+import { FeaturesKeys } from '~/lib/features';
 import db from './db.server';
 
 const seedData = (guilds: PartialDiscordGuild[]) =>
@@ -12,7 +12,7 @@ const seedData = (guilds: PartialDiscordGuild[]) =>
 
       const id = BigInt(guild.id);
 
-      const configInputs = Object.values(FeatureKeys).reduce(
+      const configInputs = Object.values(FeaturesKeys).reduce(
         (b: Omit<Prisma.GuildConfigCreateWithoutUsersInput, 'id'>, module) => ({
           ...b,
           [module]: {
