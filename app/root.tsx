@@ -1,15 +1,8 @@
 import { cssBundleHref } from '@remix-run/css-bundle';
 import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from '@remix-run/react';
-import { PropsWithChildren } from 'react';
-import MainLayout from './components/MainLayout';
+import { Outlet } from '@remix-run/react';
+import Document from './components/Wrappers/Document';
+import MainLayout from './components/Wrappers/MainLayout';
 import styles from './global.css';
 import { authenticator } from './server/auth.server';
 
@@ -42,28 +35,3 @@ export function ErrorBoundary({ error }: { error: any }) {
     </Document>
   );
 }
-
-const Document = ({
-  children,
-  title,
-}: PropsWithChildren<{ title?: string }>) => {
-  return (
-    <html lang="en">
-      <head>
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta />
-        <Links />
-        {title ? <title>{title}</title> : null}
-      </head>
-      <body className="bg-[#09090b] text-white">
-        {children}
-
-        <ScrollRestoration />
-        <Scripts />
-        {/*Enable live reload in development environment only, not production */}
-        {process.env.NODE_ENV === 'development' ? <LiveReload /> : null}
-      </body>
-    </html>
-  );
-};

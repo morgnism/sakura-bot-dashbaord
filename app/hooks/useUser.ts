@@ -1,9 +1,9 @@
-import { DiscordUser } from '~/server/auth.server';
+import { DiscordUser } from '~/type';
 import { useMatchesData } from './useMatchesData';
 
-const isUser = (user: any): user is DiscordUser => {
+function isUser(user: any): user is DiscordUser {
   return user && typeof user === 'object' && typeof user.email === 'string';
-};
+}
 
 export const useOptionalUser = (): DiscordUser | undefined => {
   const user = useMatchesData<DiscordUser>('root');

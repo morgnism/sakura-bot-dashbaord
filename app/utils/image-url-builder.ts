@@ -31,8 +31,8 @@ const DefaultImageUrlBuilderOptions: ImageUrlBuilderOptions = {
 const isPow2 = (number: number) => Math.log(number) / Math.log(2);
 
 export const imageUrlBuilder = (
-  id?: string,
-  imageHash?: string | null,
+  id: string,
+  imageHash: string | null,
   options = DefaultImageUrlBuilderOptions
 ): string | undefined => {
   const { ext, size, resource } = {

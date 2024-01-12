@@ -4,40 +4,40 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
+  url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  // directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
 model DiscordUser {
   id        BigInt        @id @unique
   createdAt DateTime      @default(now()) @map("created_at")
-  guilds    GuildConfig[] @relation("DiscordUserToGuildConfig")
+  guilds    GuildConfig[]
 
-  @@map("discordusers")
+  @@map(name: "discordusers")
 }
 
 model GuildConfig {
-  id               BigInt            @id @unique
-  prefix           String            @default("$")
-  active           Boolean           @default(false)
-  createAt         DateTime          @default(now()) @map("created_at")
-  updateAt         DateTime          @updatedAt @map("updated_at")
-  channels         Channels[]
-  leaveConfig      LeaveConfig?
-  moderationConfig ModerationConfig?
-  roleConfig       RoleConfig?
+  id     BigInt  @id @unique
+  prefix String  @default("$")
+  active Boolean @default(false)
+
+  // server activity channel to write command logs to
+  systemChannelId        BigInt? @map("system_channel_id")
+  afkChannelId           BigInt? @map("afk_channel_id")
+  rulesChannelId         BigInt? @map("rules_channel_id")
+  publicUpdatesChannelId BigInt? @map("public_updates_channel_id")
+  safetyAlertsChannelId  BigInt? @map("safety_alerts_channel_id")
+
   welcomeConfig    WelcomeConfig?
-  users            DiscordUser[]     @relation("DiscordUserToGuildConfig")
+  leaveConfig      LeaveConfig?
+  autoroleConfig   RoleConfig?
+  moderationConfig ModerationConfig?
+
+  createAt DateTime      @default(now()) @map("created_at")
+  updateAt DateTime      @updatedAt @map("updated_at")
+  users    DiscordUser[]
 
   @@map("guildconfig")
-}
-
-model Channels {
-  id               BigInt      @id
-  name             String      @db.VarChar(100)
-  type             Int
-  isUpdatesChannel Boolean     @default(false) @map("is_updates_channel")
-  guildId          BigInt      @map("guild_id")
-  guild            GuildConfig @relation(fields: [guildId], references: [id])
 }
 
 model WelcomeConfig {
@@ -71,8 +71,8 @@ model RoleConfig {
   createAt DateTime    @default(now()) @map("created_at")
   updateAt DateTime    @updatedAt @map("updated_at")
   guildId  BigInt      @unique @map("guild_id")
-  roles    Role[]
   guild    GuildConfig @relation(fields: [guildId], references: [id])
+  roles    Roles[]
 
   @@map("roleconfig")
 }
@@ -94,35 +94,32 @@ model ModerationConfig {
   updateAt            DateTime    @updatedAt @map("updated_at")
   guildId             BigInt      @unique @map("guild_id")
   guild               GuildConfig @relation(fields: [guildId], references: [id])
-  roles               Role[]
+  roles               Roles[]
 
   @@map("moderationconfig")
-}
-
-model Role {
-  id                      BigInt            @id
-  delay                   Int?
-  protected               Boolean           @default(false)
-  roleConfigId            BigInt?           @map("role_config_id")
-  moderationConfigGuildId BigInt?           @map("moderation_config_guild_id")
-  color                   Int
-  name                    String
-  action                  RoleAction        @default(DEFAULT)
-  type                    RoleType          @default(DEFAULT)
-  moderationConfig        ModerationConfig? @relation(fields: [moderationConfigGuildId], references: [guildId])
-  roleConfig              RoleConfig?       @relation(fields: [roleConfigId], references: [guildId])
-
-  @@map("role")
 }
 
 enum RoleAction {
   ADD
   REMOVE
-  DEFAULT
 }
 
 enum RoleType {
   DEFAULT
   MODERATOR
   ADMINISTRATOR
+}
+
+model Roles {
+  id                      BigInt            @id
+  action                  RoleAction        @default(ADD)
+  delay                   BigInt            @default(0)
+  type                    RoleType          @default(DEFAULT)
+  protected               Boolean           @default(false)
+  roleConfigId            BigInt?           @map("role_config_id")
+  roleConfig              RoleConfig?       @relation(fields: [roleConfigId], references: [guildId])
+  moderationConfigGuildId BigInt?           @map("moderation_config_guild_id")
+  moderationConfig        ModerationConfig? @relation(fields: [moderationConfigGuildId], references: [guildId])
+
+  @@map("roles")
 }

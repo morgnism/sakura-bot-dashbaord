@@ -1,9 +1,9 @@
 import { Link, useLocation } from '@remix-run/react';
 import { cn } from '~/utils/cn';
 import { hasChildPath } from '~/utils/path';
+import Divider from '../Divider';
 import Logo from '../Logo';
 import ProfileMenuButton from '../ProfileMenu';
-import { Separator } from '../ui/separator';
 import MobileButton from './MobileButton';
 import NotificationBell from './NotificationBell';
 
@@ -16,7 +16,7 @@ const Navbar = () => {
       className={cn(
         'flex items-center justify-between gap-6 h-16 lg:px-8',
         isDashboardPath
-          ? 'border-b border-[#27272a] shadow px-4 md:px-6'
+          ? 'bg-[#111827] border-b border-[#e5e7eb] shadow px-4 md:px-6'
           : 'max-w-7xl mx-auto'
       )}
       aria-label="global"
@@ -25,14 +25,14 @@ const Navbar = () => {
         {isDashboardPath ? (
           <>
             <MobileButton onClick={() => {}} />
-            <Separator className="lg:hidden h-6" orientation="vertical" />
+            <Divider className="lg:hidden" />
           </>
         ) : (
           <>
             <Logo />
             <Link
               to="/dashboard"
-              className="text-sm font-semibold leading-6 text-white"
+              className="text-sm font-semibold leading-6 text-[#111827] dark:text-white"
             >
               Dashboard
             </Link>
@@ -43,7 +43,7 @@ const Navbar = () => {
         {isDashboardPath && (
           <>
             <NotificationBell onClick={() => {}} />
-            <Separator className="lg:block hidden h-6" orientation="vertical" />
+            <Divider className="lg:block md:hidden" />
           </>
         )}
         <ProfileMenuButton />
