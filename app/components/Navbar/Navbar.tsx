@@ -15,9 +15,7 @@ const Navbar = () => {
     <nav
       className={cn(
         'flex items-center justify-between gap-6 h-16 lg:px-8',
-        isDashboardPath
-          ? 'border-b border-[#27272a] shadow px-4 md:px-6'
-          : 'max-w-7xl mx-auto'
+        isDashboardPath ? 'px-4 md:px-6' : 'max-w-7xl mx-auto'
       )}
       aria-label="global"
     >
