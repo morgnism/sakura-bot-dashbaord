@@ -19,15 +19,19 @@ import {
 } from '~/api/roles.server';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
-import { Card, CardContent } from '~/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card';
 import { Command, CommandGroup, CommandItem } from '~/components/ui/command';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
@@ -185,83 +189,80 @@ export default function AutoRolePage() {
         </code>
       </pre> */}
 
-      <div>
-        <Form {...form}>
-          <RemixForm
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="grid gap-6"
-          >
-            <Card>
-              <CardContent className="pt-6 border-zinc-800 grid gap-6">
-                <FormField
-                  control={form.control}
-                  name="roles"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Roles List</FormLabel>
-                      <FormDescription>
-                        The role to assign to new members or remove from
-                        existing members. Use a delay time in minutes.
-                        <br />
-                        Note: 0 minutes will apply the role immediately.
-                      </FormDescription>
-                      <div className="grid gap-2">
-                        {fields.map((field, i) => (
-                          <div
-                            key={field.id}
-                            className="grid grid-cols-3 gap-6"
-                          >
-                            <ComboBoxRoleField
-                              form={form}
-                              values={allRoles}
-                              index={i}
+      <Form {...form}>
+        <RemixForm
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="grid gap-6"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Roles List</CardTitle>
+              <CardDescription>
+                The role to assign to new members or remove from existing
+                members. Use a delay time in minutes.
+                <br />
+                Note: 0 minutes will apply the role immediately.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 border-t border-zinc-800 grid gap-6">
+              <FormField
+                control={form.control}
+                name="roles"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <div className="grid gap-2">
+                      {fields.map((field, i) => (
+                        <div key={field.id} className="grid grid-cols-3 gap-6">
+                          <ComboBoxRoleField
+                            form={form}
+                            values={allRoles}
+                            index={i}
+                          />
+                          <ComboBoxRoleActionField form={form} index={i} />
+                          <div className="flex justify-between">
+                            <FormField
+                              control={form.control}
+                              name={`roles.${i}.delay`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input placeholder="0" {...field} />
+                                  </FormControl>
+                                </FormItem>
+                              )}
                             />
-                            <ComboBoxRoleActionField form={form} index={i} />
-                            <div className="flex justify-between">
-                              <FormField
-                                control={form.control}
-                                name={`roles.${i}.delay`}
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormControl>
-                                      <Input placeholder="0" {...field} />
-                                    </FormControl>
-                                  </FormItem>
-                                )}
-                              />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                className="rounded-full"
-                                onClick={() => handleResetInput(i)}
-                              >
-                                <XCircle className="h-4 w-4" />
-                              </Button>
-                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              className="rounded-full"
+                              onClick={() => handleResetInput(i)}
+                            >
+                              <XCircle className="h-4 w-4" />
+                            </Button>
                           </div>
-                        ))}
-                      </div>
-                      <FormMessage />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="mt-2"
-                        onClick={() => append(defaultInitialValue)}
-                      >
-                        Add Role
-                      </Button>
-                    </FormItem>
-                  )}
-                />
-                <Button disabled={!form.formState.isDirty} type="submit">
-                  Save Auto Roles
-                </Button>
-              </CardContent>
-            </Card>
-          </RemixForm>
-        </Form>
-      </div>
+                        </div>
+                      ))}
+                    </div>
+                    <FormMessage />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => append(defaultInitialValue)}
+                    >
+                      Add Role
+                    </Button>
+                  </FormItem>
+                )}
+              />
+              <Button disabled={!form.formState.isDirty} type="submit">
+                Save Auto Roles
+              </Button>
+            </CardContent>
+          </Card>
+        </RemixForm>
+      </Form>
     </div>
   );
 }
