@@ -44,7 +44,7 @@ model WelcomeConfig {
   enabled   Boolean     @default(false)
   channelId BigInt?     @map("channel_id")
   dmEnabled Boolean     @default(false) @map("dm_enabled")
-  message   String?
+  message   Json?
   createAt  DateTime    @default(now()) @map("created_at")
   updateAt  DateTime    @updatedAt @map("updated_at")
   guildId   BigInt      @unique @map("guild_id")
