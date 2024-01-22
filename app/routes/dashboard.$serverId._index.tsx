@@ -1,13 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { Link, useFetcher, useLoaderData, useSubmit } from '@remix-run/react';
+import {
+  Link,
+  isRouteErrorResponse,
+  useFetcher,
+  useLoaderData,
+  useRouteError,
+  useSubmit,
+} from '@remix-run/react';
+import { PropsWithChildren } from 'react';
 import { useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import * as z from 'zod';
 import {
   EnabledFeatures,
   activateGuild,
-  getActiveFeatures,
+  getFeaturesActiveStatuses,
   initiateFeatures,
   setInitialChannels,
   setInitialRoles,
@@ -26,11 +34,17 @@ import { FeatureKeys, FeatureMap } from '~/lib/features';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.serverId, 'Missing serverId param');
-  await activateGuild(params.serverId);
-  await initiateFeatures(params.serverId);
-  await setInitialRoles(params.serverId);
-  await setInitialChannels(params.serverId);
-  return await getActiveFeatures(params.serverId);
+  try {
+    await activateGuild(params.serverId);
+    await initiateFeatures(params.serverId);
+    await setInitialRoles(params.serverId);
+    await setInitialChannels(params.serverId);
+    return await getFeaturesActiveStatuses(params.serverId);
+  } catch (error: any) {
+    throw new Response(error, {
+      status: 500,
+    });
+  }
 };
 
 type MappedFormFields = {
@@ -64,7 +78,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     if (error instanceof z.ZodError) {
       return { success: false, error: error.flatten() };
     }
-    return { error };
+    throw error;
   }
 };
 
@@ -177,5 +191,41 @@ export default function DashboardServerHomePage() {
         </fetcher.Form>
       </Form>
     </div>
+  );
+}
+
+const ErrorBody = ({
+  header,
+  children,
+}: PropsWithChildren<{ header: string }>) => (
+  <div className="grid gap-6">
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold tracking-tight">{header}</h2>
+      </div>
+      <div className="text-zinc-400">{children}</div>
+    </div>
+  </div>
+);
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <ErrorBody header="Uh oh ...">
+        <p>Status: {error.status}</p>
+        <p>{error.data || error.data.message}</p>
+      </ErrorBody>
+    );
+  }
+
+  let errorMessage = 'Unknown error';
+
+  return (
+    <ErrorBody header="Uh oh ...">
+      <p>Something went wrong.</p>
+      <pre>{errorMessage}</pre>
+    </ErrorBody>
   );
 }

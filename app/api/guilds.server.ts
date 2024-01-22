@@ -46,11 +46,21 @@ export const activateGuild = async (serverId: string) => {
   console.log(`Activating Guild (${serverId})`);
   const guildId: GuildConfig['id'] = BigInt(serverId);
 
-  return await db.guildConfig.upsert({
-    where: { id: guildId },
-    create: { id: guildId, active: true },
-    update: { active: { set: true } },
-  });
+  try {
+    const data = await db.guildConfig.upsert({
+      where: { id: guildId },
+      create: { id: guildId, active: true },
+      update: { active: { set: true } },
+    });
+
+    if (!data) {
+      throw 'Failed to active guild!';
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const initiateFeatures = async (serverId: string) => {
@@ -77,11 +87,21 @@ export const initiateFeatures = async (serverId: string) => {
     {}
   );
 
-  return await db.guildConfig.update({
-    where: { id: guildId },
-    data: updates,
-    select,
-  });
+  try {
+    const data = await db.guildConfig.update({
+      where: { id: guildId },
+      data: updates,
+      select,
+    });
+
+    if (!data) {
+      throw 'Failed to instantiate features!';
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const setInitialRoles = async (serverId: string) => {
@@ -102,13 +122,23 @@ export const setInitialRoles = async (serverId: string) => {
     return a;
   }, []);
 
-  return await db.roleConfig.update({
-    where: { guildId },
-    data: {
-      roles: { createMany: { data: roles, skipDuplicates: true } },
-    },
-    select: { roles: true },
-  });
+  try {
+    const data = await db.roleConfig.update({
+      where: { guildId },
+      data: {
+        roles: { createMany: { data: roles, skipDuplicates: true } },
+      },
+      select: { roles: true },
+    });
+
+    if (!data) {
+      throw 'Failed to instantiate features!';
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const setInitialChannels = async (serverId: string) => {
@@ -132,19 +162,29 @@ export const setInitialChannels = async (serverId: string) => {
     []
   );
 
-  return await db.guildConfig.update({
-    where: { id: guildId },
-    data: {
-      channels: {
-        createMany: { data: channels, skipDuplicates: true },
+  try {
+    const data = await db.guildConfig.update({
+      where: { id: guildId },
+      data: {
+        channels: {
+          createMany: { data: channels, skipDuplicates: true },
+        },
       },
-    },
-    select: { channels: true },
-  });
+      select: { channels: true },
+    });
+
+    if (!data) {
+      throw 'Failed to set guild channels!';
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Gets all the configs for a guild with their enabled status
-export const getActiveFeatures = async (serverId: string) => {
+export const getFeaturesActiveStatuses = async (serverId: string) => {
   console.log('Loading active features...');
   const guildId: GuildConfig['id'] = BigInt(serverId);
   const select = Object.values(FeatureKeys).reduce(
@@ -155,13 +195,21 @@ export const getActiveFeatures = async (serverId: string) => {
     {}
   );
 
-  const configs = await db.guildConfig.findUnique({
-    where: { id: guildId },
-    select,
-  });
+  try {
+    const data = await db.guildConfig.findUnique({
+      where: { id: guildId },
+      select,
+    });
 
-  const serialize = JSON.stringify(configs, bigintSerializer);
-  return JSON.parse(serialize) as EnabledFeatures;
+    if (!data) {
+      throw 'Failed to fetch feature statuses!';
+    }
+
+    const serialize = JSON.stringify(data, bigintSerializer);
+    return JSON.parse(serialize) as EnabledFeatures;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const updateFeatureStatus = async (
@@ -189,13 +237,22 @@ export const updateFeatureStatus = async (
       data: {} as Prisma.GuildConfigUpdateInput,
     }
   );
-  const config = await db.guildConfig.update({
-    where: { id: guildId },
-    ...guildUpdates,
-  });
 
-  const serialize = JSON.stringify(config, bigintSerializer);
-  return JSON.parse(serialize);
+  try {
+    const data = await db.guildConfig.update({
+      where: { id: guildId },
+      ...guildUpdates,
+    });
+
+    if (!data) {
+      throw `Failed to update with ${JSON.stringify(updates, null, 2)}.`;
+    }
+
+    const serialize = JSON.stringify(data, bigintSerializer);
+    return JSON.parse(serialize);
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Gets the server's main settings
