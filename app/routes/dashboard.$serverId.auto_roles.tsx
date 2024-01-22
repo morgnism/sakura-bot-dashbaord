@@ -6,7 +6,6 @@ import {
   useLoaderData,
   useSubmit,
 } from '@remix-run/react';
-import { Check, ChevronsUpDown, XCircle } from 'lucide-react';
 import { useEffect } from 'react';
 import { UseFormReturn, useFieldArray, useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
@@ -17,6 +16,7 @@ import {
   getAllRoles,
   saveAutoRole,
 } from '~/api/roles.server';
+import { Icons } from '~/components/icons';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import {
@@ -237,7 +237,7 @@ export default function AutoRolePage() {
                               className="rounded-full"
                               onClick={() => handleResetInput(i)}
                             >
-                              <XCircle className="h-4 w-4" />
+                              <Icons.xCircle className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
@@ -306,7 +306,7 @@ const ComboBoxRoleField = ({ form, values, index }: ComboBoxRoleFieldProps) => (
                       'Select a role'
                     )}
                   </div>
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  <Icons.chevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
@@ -323,7 +323,7 @@ const ComboBoxRoleField = ({ form, values, index }: ComboBoxRoleFieldProps) => (
                         });
                       }}
                     >
-                      <Check
+                      <Icons.check
                         className={cn(
                           'mr-2 h-4 w-4',
                           role.id === field.value ? 'opacity-100' : 'opacity-0'
@@ -391,7 +391,7 @@ const ComboBoxRoleActionField = ({
                         )
                       : 'Select a role'}
                   </div>
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  <Icons.chevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
@@ -408,7 +408,7 @@ const ComboBoxRoleActionField = ({
                         });
                       }}
                     >
-                      <Check
+                      <Icons.check
                         className={cn(
                           'mr-2 h-4 w-4',
                           action.value === field.value

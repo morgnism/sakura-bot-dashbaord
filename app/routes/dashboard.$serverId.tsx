@@ -1,44 +1,35 @@
 import { NavLink, Outlet } from '@remix-run/react';
-import {
-  BadgePlus,
-  DoorOpen,
-  Hash,
-  LayoutDashboard,
-  PieChart,
-  ScrollText,
-  Settings,
-  Shield,
-} from 'lucide-react';
 import Logo from '~/components/Logo';
 import Navbar from '~/components/Navbar';
+import { Icons } from '~/components/icons';
 import { AppRoutes } from '~/lib/route';
 import { cn } from '~/utils/cn';
 
 export const MAIN_SIDEBAR_MENU = [
-  { to: '', label: 'Dashboard', Icon: LayoutDashboard },
-  { to: `.${AppRoutes.SETTINGS}`, label: 'Settings', Icon: Settings },
+  { to: '', label: 'Dashboard', Icon: Icons.layoutDashboard },
+  { to: `.${AppRoutes.SETTINGS}`, label: 'Settings', Icon: Icons.settings },
 ];
 
 const SERVER_MANAGEMENT_SIDEBAR_MENU = [
   {
     to: `.${AppRoutes.WELCOME}`,
     label: 'Welcome Channel',
-    Icon: Hash,
+    Icon: Icons.hash,
   },
   {
     to: `.${AppRoutes.GREETING}`,
     label: 'Welcome and Goodbye',
-    Icon: DoorOpen,
+    Icon: Icons.doorOpen,
   },
   {
     to: `.${AppRoutes.AUTO_ROLES}`,
     label: 'Auto Roles',
-    Icon: BadgePlus,
+    Icon: Icons.plus,
   },
   {
     to: `.${AppRoutes.MODERATOR}`,
     label: 'Moderator',
-    Icon: Shield,
+    Icon: Icons.shield,
   },
 ];
 
@@ -46,12 +37,12 @@ export const MONITORING = [
   {
     to: `.${AppRoutes.BAN_ANALYTICS}`,
     label: 'Ban Analytics',
-    Icon: PieChart,
+    Icon: Icons.pieChart,
   },
   {
     to: `.${AppRoutes.LOGS}`,
     label: 'Logs',
-    Icon: ScrollText,
+    Icon: Icons.scroll,
   },
 ];
 

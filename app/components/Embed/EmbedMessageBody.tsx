@@ -1,5 +1,5 @@
-import { Trash2 } from 'lucide-react';
 import { PropsWithChildren } from 'react';
+import { Icons } from '../icons';
 import { Button } from '../plate-ui/button';
 
 type EmbedBodyProps = {
@@ -25,7 +25,7 @@ export const EmbedMessageBody = ({
         className="px-3"
         onClick={() => onRemove()}
       >
-        <Trash2 className="h-4 w-4" />
+        <Icons.delete2 className="h-4 w-4" />
       </Button>
     </div>
   );

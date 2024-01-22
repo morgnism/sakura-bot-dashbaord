@@ -1,6 +1,6 @@
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { DiscordUser } from '~/server/auth.server';
 import { imageUrlBuilder } from '~/utils/image-url-builder';
+import { Icons } from '../icons';
 
 type ProfileFlyoutMenuControl = {
   isMenuOpen: boolean;
@@ -19,9 +19,9 @@ const ProfileFlyoutMenuControl = ({
       height="512"
     />
     {isMenuOpen ? (
-      <ChevronUp className="mx-1 h-5 transition-all text-zinc-50" />
+      <Icons.arrowUp className="mx-1 h-5 transition-all text-zinc-50" />
     ) : (
-      <ChevronDown className="mx-1 group-hover:text-zinc-50 text-[#6b7280] h-5 transition-all" />
+      <Icons.arrowDown className="mx-1 group-hover:text-zinc-50 text-[#6b7280] h-5 transition-all" />
     )}
   </div>
 );

@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { Form as RemixForm, useLoaderData, useSubmit } from '@remix-run/react';
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
-import { Check, ChevronsUpDown, Hash, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { UseFormReturn, useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
@@ -12,6 +11,7 @@ import { getWelcomeChannelSettings } from '~/api/welcome.server';
 import { EmbedContainer, EmbedMessageBody } from '~/components/Embed';
 import TextArea from '~/components/MessageEditors';
 import { Document } from '~/components/MessageEditors/TextArea';
+import { Icons } from '~/components/icons';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Command, CommandGroup, CommandItem } from '~/components/ui/command';
@@ -168,7 +168,7 @@ export default function WelcomeChannelPage() {
                 className="w-full"
                 onClick={handleAddEditorBlock}
               >
-                Add Element <Plus className="ml-2 h-4 w-4" />
+                Add Element <Icons.plus className="ml-2 h-4 w-4" />
               </Button>
             </CardContent>
           </Card>
@@ -212,13 +212,13 @@ const ComboBoxChannelsField = ({
                         .filter((channel) => field.value === channel.id)
                         .map((channel) => (
                           <div key={channel.id} className="flex items-center">
-                            <Hash className="h-4 w-4 mr-1" />
+                            <Icons.hash className="h-4 w-4 mr-1" />
                             {channel.name}
                           </div>
                         ))
                     : 'Select a channel'}
                 </div>
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <Icons.chevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </FormControl>
           </PopoverTrigger>
@@ -235,14 +235,14 @@ const ComboBoxChannelsField = ({
                       });
                     }}
                   >
-                    <Check
+                    <Icons.check
                       className={cn(
                         'mr-2 h-4 w-4',
                         channel.id === field.value ? 'opacity-100' : 'opacity-0'
                       )}
                     />
                     <div className="flex items-center">
-                      <Hash className="h-4 w-4 mr-1" />
+                      <Icons.hash className="h-4 w-4 mr-1" />
                       {channel.name}
                     </div>
                   </CommandItem>

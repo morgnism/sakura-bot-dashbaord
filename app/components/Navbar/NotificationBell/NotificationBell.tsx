@@ -1,4 +1,4 @@
-import { Bell } from 'lucide-react';
+import { Icons } from '~/components/icons';
 import { Button } from '~/components/ui/button';
 
 type NotificationBellProps = {
@@ -12,7 +12,7 @@ const NotificationBell = ({ onClick }: NotificationBellProps) => (
     onClick={onClick}
   >
     <span className="sr-only">View notifications</span>
-    <Bell className="h-5 w-5" />
+    <Icons.bell className="h-5 w-5" />
   </Button>
 );
 

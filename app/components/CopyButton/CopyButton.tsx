@@ -1,5 +1,5 @@
-import { CheckCircle2, Copy } from 'lucide-react';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
+import { Icons } from '../icons';
 import { Button } from '../ui/button';
 
 type CopyButtonProps = {
@@ -16,12 +16,12 @@ const CopyButton = ({ toCopy }: CopyButtonProps) => {
     <Button className="transition" variant="ghost" onClick={handleClick}>
       {copiedText ? (
         <>
-          <CheckCircle2 className="mr-2 h-4 w-4" />
+          <Icons.checkCircle2 className="mr-2 h-4 w-4" />
           Copied!
         </>
       ) : (
         <>
-          <Copy className="mr-2 h-4 w-4" />
+          <Icons.copy className="mr-2 h-4 w-4" />
           Server ID
         </>
       )}

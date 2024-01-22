@@ -1,4 +1,4 @@
-import { Trash2 } from 'lucide-react';
+import { Icons } from '../icons';
 import { Button } from '../plate-ui/button';
 
 type EmbeddedImageBodyProps = {
@@ -21,7 +21,7 @@ const EmbeddedImageBody = ({ onRemove }: EmbeddedImageBodyProps) => {
         className="px-3"
         onClick={() => onRemove()}
       >
-        <Trash2 className="h-4 w-4" />
+        <Icons.delete2 className="h-4 w-4" />
       </Button>
     </div>
   );

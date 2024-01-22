@@ -6,7 +6,6 @@ import {
   useLoaderData,
   useSubmit,
 } from '@remix-run/react';
-import { Check, ChevronsUpDown, Hash } from 'lucide-react';
 import { useEffect } from 'react';
 import { UseFormReturn, useForm } from 'react-hook-form';
 import { LoaderFunctionArgs } from 'react-router';
@@ -22,6 +21,7 @@ import {
 import { RoleType, getAdminRoles } from '~/api/roles.server';
 import AccordionCard from '~/components/AccordionCard';
 import CopyButton from '~/components/CopyButton/CopyButton';
+import { Icons } from '~/components/icons';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Command, CommandGroup, CommandItem } from '~/components/ui/command';
@@ -40,13 +40,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
 import { DEFAULT_PREFIX } from '~/lib/constants';
 import { cn } from '~/utils/cn';
 
@@ -298,7 +291,7 @@ const ComboBoxRoleField = ({ form, values }: ComboBoxRoleFieldProps) => (
                         ))
                     : 'Select a role'}
                 </div>
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <Icons.chevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </FormControl>
           </PopoverTrigger>
@@ -327,7 +320,7 @@ const ComboBoxRoleField = ({ form, values }: ComboBoxRoleFieldProps) => (
                       }
                     }}
                   >
-                    <Check
+                    <Icons.check
                       className={cn(
                         'mr-2 h-4 w-4',
                         field.value.find((value) => value === role.id)
@@ -388,13 +381,13 @@ const ComboBoxChannelsField = ({
                         .filter((channel) => field.value === channel.id)
                         .map((channel) => (
                           <div key={channel.id} className="flex items-center">
-                            <Hash className="h-4 w-4 mr-1" />
+                            <Icons.hash className="h-4 w-4 mr-1" />
                             {channel.name}
                           </div>
                         ))
                     : 'Select a role'}
                 </div>
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <Icons.chevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </FormControl>
           </PopoverTrigger>
@@ -411,14 +404,14 @@ const ComboBoxChannelsField = ({
                       });
                     }}
                   >
-                    <Check
+                    <Icons.check
                       className={cn(
                         'mr-2 h-4 w-4',
                         channel.id === field.value ? 'opacity-100' : 'opacity-0'
                       )}
                     />
                     <div className="flex items-center">
-                      <Hash className="h-4 w-4 mr-1" />
+                      <Icons.hash className="h-4 w-4 mr-1" />
                       {channel.name}
                     </div>
                   </CommandItem>
