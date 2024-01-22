@@ -1,12 +1,13 @@
-import { Trash2 } from 'lucide-react';
-import { PropsWithChildren } from 'react';
-import { nowDateFormat } from '~/utils/date-format';
+import { format } from 'date-fns';
+import { PropsWithChildren, useMemo } from 'react';
 import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
 
-type EmbedProps = {};
+export const EmbedContainer = ({ children }: PropsWithChildren) => {
+  const nowDateFormat = useMemo(
+    () => format(new Date(), "'Today at' HH:mm a"),
+    []
+  );
 
-export const EmbedContainer = ({ children }: PropsWithChildren<EmbedProps>) => {
   return (
     <div className="flex">
       <div className="mr-4 w-10">
@@ -16,7 +17,7 @@ export const EmbedContainer = ({ children }: PropsWithChildren<EmbedProps>) => {
           className="w-10 h-10 rounded-full"
         />
       </div>
-      <div>
+      <div className="grid gap-2">
         <div className="flex items-center">
           <span className="font-bold">Sakura Bot</span>
           <Badge className="rounded-[4px] text-[10px] flex items-center gap-1 mx-2 py-0 px-0.5 text-zinc-50 bg-[#5865F2]">
@@ -30,60 +31,3 @@ export const EmbedContainer = ({ children }: PropsWithChildren<EmbedProps>) => {
     </div>
   );
 };
-
-type EmbedBodyProps = {
-  onRemove: () => void;
-};
-
-export const EmbedBody = ({
-  onRemove,
-  children,
-}: PropsWithChildren<EmbedBodyProps>) => {
-  return (
-    <div className="my-2 flex">
-      <div
-        className="w-1 shrink-0 bg-[#202225] rounded-l"
-        style={{ backgroundColor: '#0099ff' }}
-      ></div>
-      <div className="flex flex-col p-4 bg-[#2C2F33] rounded-r w-full lg:w-[530px] mr-5">
-        {children}
-      </div>
-      <Button type="button" variant="destructive" onClick={() => onRemove()}>
-        <Trash2 className="h-4 w-4" />
-      </Button>
-    </div>
-  );
-};
-
-// type EmbedThumbnailProps = {}
-
-// const EmbedThumbnail = (props: EmbedThumbnailProps) => {
-//   return (
-//     <div>
-//       <img
-//         className="max-w-[80px] max-h-[80px] ml-4 rounded-md"
-//         src="https://i.imgur.com/AfFp7pu.png"
-//         alt=""
-//       ></img>
-//     </div>
-//   );
-// };
-
-// type EmbedFooter = {};
-
-// const EmbedFooter = (props: EmbedFooter) => {
-//   return (
-//     <div className="flex items-center mt-2 text-xs text-[#72767d]">
-//       <img
-//         className="shrink-0 w-5 h-5 mr-2 rounded-full"
-//         src="https://i.imgur.com/AfFp7pu.png"
-//         alt=""
-//       />
-//       <span>
-//         <span>Some footer text here</span>
-//         <span className="text-[#3b3c42] font-bold mx-2">•</span>
-//         <span>01/01/2018</span>
-//       </span>
-//     </div>
-//   );
-// };
