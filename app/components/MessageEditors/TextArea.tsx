@@ -1,31 +1,33 @@
-import { useCallback, useMemo } from 'react';
-import { Descendant, createEditor } from 'slate';
-import { withHistory } from 'slate-history';
-import { Editable, RenderElementProps, Slate, withReact } from 'slate-react';
+import { Plate } from '@udecode/plate-common';
+import { Editor } from './editor';
+import { plugins } from './plate-plugins';
+import { editableProps } from './editableProps';
+import { cn } from '@udecode/cn';
 
-const TextArea = ({ data }: { data: Descendant[] }) => {
-  const renderElement = useCallback(
-    (props: RenderElementProps) => <Element {...props} />,
-    []
-  );
-  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+export type Document = {
+  id: string;
+  type: string;
+  children: {
+    text: string;
+  }[];
+};
 
+type TextAreaProps = {
+  data: Document[];
+};
+
+export function TextArea({ data }: TextAreaProps) {
   return (
-    <Slate editor={editor} initialValue={data}>
-      <Editable
-        renderElement={renderElement}
-        placeholder="Enter a message..."
+    <Plate plugins={plugins} initialValue={data} normalizeInitialValue>
+      <Editor
+        {...editableProps}
+        variant="ghost"
+        size="md"
+        focusRing={false}
+        className={cn(editableProps.className, 'p-4 bg-[#2C2F33] rounded-r')}
       />
-    </Slate>
+    </Plate>
   );
-};
-
-const Element = ({ attributes, children, element }: RenderElementProps) => {
-  switch (element.type) {
-    case 'paragraph':
-    default:
-      return <p {...attributes}>{children}</p>;
-  }
-};
+}
 
 export default TextArea;

@@ -1,3 +1,4 @@
-import { EmbedContainer, EmbedBody } from './Embed';
+import { EmbedContainer } from './Embed';
+import EmbedMessageBody from './EmbedMessageBody';
 
-export { EmbedContainer, EmbedBody };
+export { EmbedMessageBody, EmbedContainer };

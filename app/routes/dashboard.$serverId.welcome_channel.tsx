@@ -1,16 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { Form as RemixForm, useLoaderData, useSubmit } from '@remix-run/react';
+import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
 import { Check, ChevronsUpDown, Hash, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { UseFormReturn, useForm } from 'react-hook-form';
-import { Descendant } from 'slate';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
 import { ShortGuildChannel, getServerChannels } from '~/api/guilds.server';
 import { getWelcomeChannelSettings } from '~/api/welcome.server';
-import { EmbedBody, EmbedContainer } from '~/components/Embed';
+import { EmbedContainer, EmbedMessageBody } from '~/components/Embed';
 import TextArea from '~/components/MessageEditors';
+import { Document } from '~/components/MessageEditors/TextArea';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Command, CommandGroup, CommandItem } from '~/components/ui/command';
@@ -52,19 +53,21 @@ const welcomeChannelFormSchema = z.object({
 
 type WelcomeChannelFormData = z.infer<typeof welcomeChannelFormSchema>;
 
-const defaultMessageValue: Descendant[] = [
+const defaultMessageValue = [
   {
-    type: 'paragraph',
+    id: '1',
+    type: ELEMENT_PARAGRAPH,
     children: [{ text: '' }],
   },
 ];
 
-const initialValue: Descendant[] = [
+const initialValue = [
   {
-    type: 'paragraph',
+    id: '1',
+    type: ELEMENT_PARAGRAPH,
     children: [
       {
-        text: 'this supports [named links](https://discordapp.com) on top of the previously shown subset of markdown. ```\nyes, even code blocks```',
+        text: '~~strike through text~~',
       },
     ],
   },
@@ -87,13 +90,13 @@ export default function WelcomeChannelPage() {
   });
   const submit = useSubmit();
 
-  const [editorsBlocks, setEditorBlocks] = useState<Descendant[][]>([
+  const [editorsBlocks, setEditorBlocks] = useState<Document[][]>([
     initialValue,
   ]);
 
   const handleAddEditorBlock = () => {
     const tempArr = [...editorsBlocks];
-    const card: Descendant[] = defaultMessageValue;
+    const card: Document[] = defaultMessageValue;
     tempArr.push(card);
     setEditorBlocks(tempArr);
   };
@@ -151,11 +154,12 @@ export default function WelcomeChannelPage() {
             <CardContent className="pt-6 border-t border-zinc-800 flex flex-col gap-6">
               <EmbedContainer>
                 {editorsBlocks.map((block, i) => (
-                  <div key={i} className="flex">
-                    <EmbedBody onRemove={() => handleRemoveEditorBlock(i)}>
-                      <TextArea data={block} />
-                    </EmbedBody>
-                  </div>
+                  <EmbedMessageBody
+                    key={i}
+                    onRemove={() => handleRemoveEditorBlock(i)}
+                  >
+                    <TextArea data={block} />
+                  </EmbedMessageBody>
                 ))}
               </EmbedContainer>
               <Button
