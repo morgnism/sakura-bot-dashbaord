@@ -8,6 +8,6 @@ export const enum AppRoutes {
   AUTO_ROLES = '/auto_roles',
   MODERATOR = '/moderator',
   SETTINGS = '/settings',
-  BAN_ANALYTICS = '/bans',
+  ANALYTICS = '/analytics',
   LOGS = '/logs',
 }

@@ -35,7 +35,7 @@ const SERVER_MANAGEMENT_SIDEBAR_MENU = [
 
 export const MONITORING = [
   {
-    to: `.${AppRoutes.BAN_ANALYTICS}`,
+    to: `.${AppRoutes.ANALYTICS}`,
     label: 'Ban Analytics',
     Icon: Icons.pieChart,
   },
