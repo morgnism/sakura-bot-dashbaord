@@ -32,19 +32,23 @@ import { cn } from '~/utils/cn';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.serverId, 'Missing serverId param');
-  const [welcomeChannelSettings, guildChannels] = await Promise.all([
-    getWelcomeChannelSettings(params.serverId),
-    getServerChannels(params.serverId),
-  ]);
+  try {
+    const [welcomeChannelSettings, guildChannels] = await Promise.all([
+      getWelcomeChannelSettings(params.serverId),
+      getServerChannels(params.serverId),
+    ]);
 
-  return {
-    enabled: welcomeChannelSettings.enabled,
-    channelId: welcomeChannelSettings.channelId,
-    dmEnabled: welcomeChannelSettings.dmEnabled,
-    message: welcomeChannelSettings.message,
-    selectedChannelId: welcomeChannelSettings.channelId,
-    guildChannels,
-  };
+    return {
+      enabled: welcomeChannelSettings.enabled,
+      channelId: welcomeChannelSettings.channelId,
+      dmEnabled: welcomeChannelSettings.dmEnabled,
+      message: welcomeChannelSettings.message,
+      selectedChannelId: welcomeChannelSettings.channelId,
+      guildChannels,
+    };
+  } catch (error) {
+    throw error;
+  }
 };
 
 const welcomeChannelFormSchema = z.object({

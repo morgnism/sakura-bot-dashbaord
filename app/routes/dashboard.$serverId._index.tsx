@@ -8,7 +8,6 @@ import {
   useRouteError,
   useSubmit,
 } from '@remix-run/react';
-import { PropsWithChildren } from 'react';
 import { useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import * as z from 'zod';
@@ -21,6 +20,7 @@ import {
   setInitialRoles,
   updateFeatureStatus,
 } from '~/api/guilds.server';
+import ErrorLayout from '~/components/ErrorLayout';
 import {
   Form,
   FormControl,
@@ -194,38 +194,24 @@ export default function DashboardServerHomePage() {
   );
 }
 
-const ErrorBody = ({
-  header,
-  children,
-}: PropsWithChildren<{ header: string }>) => (
-  <div className="grid gap-6">
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">{header}</h2>
-      </div>
-      <div className="text-zinc-400">{children}</div>
-    </div>
-  </div>
-);
-
 export function ErrorBoundary() {
   const error = useRouteError();
 
   if (isRouteErrorResponse(error)) {
     return (
-      <ErrorBody header="Uh oh ...">
+      <ErrorLayout header="Uh oh ...">
         <p>Status: {error.status}</p>
         <p>{error.data || error.data.message}</p>
-      </ErrorBody>
+      </ErrorLayout>
     );
   }
 
   let errorMessage = 'Unknown error';
 
   return (
-    <ErrorBody header="Uh oh ...">
+    <ErrorLayout header="Uh oh ...">
       <p>Something went wrong.</p>
       <pre>{errorMessage}</pre>
-    </ErrorBody>
+    </ErrorLayout>
   );
 }

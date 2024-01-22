@@ -45,29 +45,33 @@ import { cn } from '~/utils/cn';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.serverId, 'Missing serverId param');
-  const [settings, guildRoles, guildChannels] = await Promise.all([
-    getServerSettings(params.serverId),
-    getAdminRoles(params.serverId),
-    getServerChannels(params.serverId),
-  ]);
-  const adminRolesIds = guildRoles.reduce((a: string[], role) => {
-    if (role.type !== RoleType.ADMINISTRATOR) {
+  try {
+    const [settings, guildRoles, guildChannels] = await Promise.all([
+      getServerSettings(params.serverId),
+      getAdminRoles(params.serverId),
+      getServerChannels(params.serverId),
+    ]);
+    const adminRolesIds = guildRoles.reduce((a: string[], role) => {
+      if (role.type !== RoleType.ADMINISTRATOR) {
+        return a;
+      }
+      a.push(role.id);
       return a;
-    }
-    a.push(role.id);
-    return a;
-  }, []);
+    }, []);
 
-  const selectedChannelId = String(
-    guildChannels.find((channel) => channel.isUpdatesChannel)?.id
-  );
-  return {
-    settings,
-    guildRoles,
-    adminRolesIds,
-    guildChannels,
-    selectedChannelId,
-  };
+    const selectedChannelId = String(
+      guildChannels.find((channel) => channel.isUpdatesChannel)?.id
+    );
+    return {
+      settings,
+      guildRoles,
+      adminRolesIds,
+      guildChannels,
+      selectedChannelId,
+    };
+  } catch (error) {
+    throw error;
+  }
 };
 
 const settingsFormSchema = z.object({
@@ -100,7 +104,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     if (error instanceof z.ZodError) {
       return { success: false, data: null, error: error.flatten() };
     }
-    return { success: false, data: null, error };
+    throw error;
   }
 };
 

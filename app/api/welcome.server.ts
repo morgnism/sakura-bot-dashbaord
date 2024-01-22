@@ -10,9 +10,17 @@ type WelcomeChannelSettings = Omit<WelcomeConfig, 'id' | 'channelId'> & {
 export const getWelcomeChannelSettings = async (serverId: string) => {
   console.log('Loading welcome channel settings...');
   const guildId: GuildConfig['id'] = BigInt(serverId);
-  const config = await db.welcomeConfig.findUnique({
-    where: { guildId },
-  });
-  const serialize = JSON.stringify(config, bigintSerializer);
-  return JSON.parse(serialize) as WelcomeChannelSettings;
+  try {
+    const data = await db.welcomeConfig.findUnique({
+      where: { guildId },
+    });
+
+    if (!data) {
+      throw 'Failed to fetch guild channels!';
+    }
+    const serialize = JSON.stringify(data, bigintSerializer);
+    return JSON.parse(serialize) as WelcomeChannelSettings;
+  } catch (error) {
+    throw error;
+  }
 };

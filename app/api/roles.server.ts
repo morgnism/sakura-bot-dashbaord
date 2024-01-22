@@ -21,46 +21,56 @@ type UpdateAutoRoleMutation = {
 export const getAllRoles = async (serverId: string): Promise<AutoRole[]> => {
   console.log('Loading all saved roles...');
   const guildId: GuildConfig['id'] = BigInt(serverId);
-  const config = await db.roleConfig.findUnique({
-    where: { guildId },
-    select: { roles: true },
-  });
 
-  if (!config) {
-    return [];
-  }
-
-  return config.roles.reduce((a: AutoRole[], role) => {
-    a.push({
-      id: String(role.id),
-      name: role.name,
-      color: decimalToHex(role.color),
-      action: role.action,
-      delay: role.delay ? role.delay : 0,
+  try {
+    const config = await db.roleConfig.findUnique({
+      where: { guildId },
+      select: { roles: true },
     });
-    return a;
-  }, []);
+
+    if (!config) {
+      throw 'Failed to fetch roles!';
+    }
+
+    return config.roles.reduce((a: AutoRole[], role) => {
+      a.push({
+        id: String(role.id),
+        name: role.name,
+        color: decimalToHex(role.color),
+        action: role.action,
+        delay: role.delay ? role.delay : 0,
+      });
+      return a;
+    }, []);
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Gets the server's admin roles
 export const getAdminRoles = async (serverId: string): Promise<ShortRole[]> => {
   console.log('Loading admin roles...');
   const guildId: GuildConfig['id'] = BigInt(serverId);
-  const config = await db.roleConfig.findUnique({
-    where: { guildId },
-    select: { roles: true },
-  });
 
-  if (!config) {
-    return [];
+  try {
+    const config = await db.roleConfig.findUnique({
+      where: { guildId },
+      select: { roles: true },
+    });
+
+    if (!config) {
+      throw 'Failed to fetch admin roles!';
+    }
+
+    return config.roles.map((role) => ({
+      id: String(role.id),
+      color: decimalToHex(role.color),
+      name: role.name,
+      type: role.type,
+    }));
+  } catch (error) {
+    throw error;
   }
-
-  return config.roles.map((role) => ({
-    id: String(role.id),
-    color: decimalToHex(role.color),
-    name: role.name,
-    type: role.type,
-  }));
 };
 
 export const saveAutoRole = async (

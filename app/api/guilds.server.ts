@@ -259,11 +259,20 @@ export const updateFeatureStatus = async (
 export const getServerSettings = async (serverId: string) => {
   console.log(`Loading settings for Guild (${serverId})`);
   const guildId: GuildConfig['id'] = BigInt(serverId);
-  const configs = await db.guildConfig.findUnique({
-    where: { id: guildId },
-  });
-  const serialize = JSON.stringify(configs, bigintSerializer);
-  return JSON.parse(serialize) as GuildSettings;
+  try {
+    const data = await db.guildConfig.findUnique({
+      where: { id: guildId },
+    });
+
+    if (!data) {
+      throw 'Failed to fetch server settings!';
+    }
+
+    const serialize = JSON.stringify(data, bigintSerializer);
+    return JSON.parse(serialize) as GuildSettings;
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Gets the server's saved channels
@@ -272,19 +281,24 @@ export const getServerChannels = async (
 ): Promise<ShortGuildChannel[]> => {
   console.log(`Loading channels for Guild (${serverId})`);
   const guildId: GuildConfig['id'] = BigInt(serverId);
-  const channels = await db.channels.findMany({
-    where: { guildId },
-  });
 
-  if (!channels) {
-    return [];
+  try {
+    const data = await db.channels.findMany({
+      where: { guildId },
+    });
+
+    if (!data) {
+      throw 'Failed to fetch guild channels!';
+    }
+
+    return data.map((channel) => ({
+      id: String(channel.id),
+      name: channel.name,
+      isUpdatesChannel: channel.isUpdatesChannel,
+    }));
+  } catch (error) {
+    throw error;
   }
-
-  return channels.map((channel) => ({
-    id: String(channel.id),
-    name: channel.name,
-    isUpdatesChannel: channel.isUpdatesChannel,
-  }));
 };
 
 export const updateServerSettings = async (
