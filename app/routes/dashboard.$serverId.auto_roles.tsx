@@ -52,18 +52,27 @@ export const RoleAction = {
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.serverId, 'Missing serverId param');
-  const allRoles = await getAllRoles(params.serverId);
-  const autoRoles = allRoles.reduce((a: NonDefaultAutoRole[], role) => {
-    if (role.action !== RoleAction.DEFAULT && typeof role.delay === 'number') {
-      a.push({
-        role: role.id,
-        action: role.action,
-        delay: role.delay,
-      });
-    }
-    return a;
-  }, []);
-  return { allRoles, autoRoles };
+  try {
+    const allRoles = await getAllRoles(params.serverId);
+    const autoRoles = allRoles.reduce((a: NonDefaultAutoRole[], role) => {
+      if (
+        role.action !== RoleAction.DEFAULT &&
+        typeof role.delay === 'number'
+      ) {
+        a.push({
+          role: role.id,
+          action: role.action,
+          delay: role.delay,
+        });
+      }
+      return a;
+    }, []);
+    return { allRoles, autoRoles };
+  } catch (error: any) {
+    throw new Response(error, {
+      status: 500,
+    });
+  }
 };
 
 const RoleActionState: [string, string] = [RoleAction.ADD, RoleAction.REMOVE];
@@ -119,7 +128,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     if (error instanceof z.ZodError) {
       return { success: false, data: { roles: [] }, error: error.flatten() };
     }
-    return { success: false, data: { roles: [] }, error };
+    throw error;
   }
 };
 

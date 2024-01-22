@@ -1,18 +1,26 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { Link, useFetcher, useLoaderData, useSubmit } from '@remix-run/react';
+import {
+  Link,
+  isRouteErrorResponse,
+  useFetcher,
+  useLoaderData,
+  useRouteError,
+  useSubmit,
+} from '@remix-run/react';
 import { useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import * as z from 'zod';
 import {
   EnabledFeatures,
   activateGuild,
-  getActiveFeatures,
+  getFeaturesActiveStatuses,
   initiateFeatures,
   setInitialChannels,
   setInitialRoles,
   updateFeatureStatus,
 } from '~/api/guilds.server';
+import ErrorLayout from '~/components/ErrorLayout';
 import {
   Form,
   FormControl,
@@ -26,11 +34,17 @@ import { FeatureKeys, FeatureMap } from '~/lib/features';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.serverId, 'Missing serverId param');
-  await activateGuild(params.serverId);
-  await initiateFeatures(params.serverId);
-  await setInitialRoles(params.serverId);
-  await setInitialChannels(params.serverId);
-  return await getActiveFeatures(params.serverId);
+  try {
+    await activateGuild(params.serverId);
+    await initiateFeatures(params.serverId);
+    await setInitialRoles(params.serverId);
+    await setInitialChannels(params.serverId);
+    return await getFeaturesActiveStatuses(params.serverId);
+  } catch (error: any) {
+    throw new Response(error, {
+      status: 500,
+    });
+  }
 };
 
 type MappedFormFields = {
@@ -64,7 +78,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     if (error instanceof z.ZodError) {
       return { success: false, error: error.flatten() };
     }
-    return { error };
+    throw error;
   }
 };
 
@@ -177,5 +191,27 @@ export default function DashboardServerHomePage() {
         </fetcher.Form>
       </Form>
     </div>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <ErrorLayout header="Uh oh ...">
+        <p>Status: {error.status}</p>
+        <p>{error.data || error.data.message}</p>
+      </ErrorLayout>
+    );
+  }
+
+  let errorMessage = 'Unknown error';
+
+  return (
+    <ErrorLayout header="Uh oh ...">
+      <p>Something went wrong.</p>
+      <pre>{errorMessage}</pre>
+    </ErrorLayout>
   );
 }
