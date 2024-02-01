@@ -13,7 +13,10 @@ export type { GuildConfig } from '@prisma/client';
 
 export const DEFAULT_ROLE = '@everyone';
 
-type GuildSettings = Omit<GuildConfig, 'id'> & { id: string };
+type GuildSettings = Omit<GuildConfig, 'id' | 'updatesChannelId'> & {
+  id: string;
+  updatesChannelId: string;
+};
 
 type GuildChannel = Omit<Channels, 'id'> & { id: string };
 

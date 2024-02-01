@@ -21,6 +21,7 @@ model GuildConfig {
   active           Boolean           @default(false)
   createAt         DateTime          @default(now()) @map("created_at")
   updateAt         DateTime          @updatedAt @map("updated_at")
+  updatesChannelId BigInt?           @map("channel_id")
   channels         Channels[]
   leaveConfig      LeaveConfig?
   moderationConfig ModerationConfig?
