@@ -59,15 +59,12 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       return a;
     }, []);
 
-    const selectedChannelId = String(
-      guildChannels.find((channel) => channel.isUpdatesChannel)?.id
-    );
     return {
       settings,
       guildRoles,
       adminRolesIds,
       guildChannels,
-      selectedChannelId,
+      selectedChannelId: settings.updatesChannelId,
     };
   } catch (error) {
     throw error;
@@ -217,37 +214,6 @@ export default function GuildSettingsPage() {
             isOpenByDefault={true}
           >
             <div className="grid gap-2">
-              {/* <FormField
-                control={form.control}
-                name="updatesChannel"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Available Guild Channels</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a guild channel" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {guildChannels.map(({ id, name }) => (
-                          <SelectItem key={id} value={id}>
-                            {name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      All bot communicates apart from text and slash commands
-                      will appear in this channel.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
               <ComboBoxChannelsField form={form} values={guildChannels} />
             </div>
           </AccordionCard>
@@ -367,7 +333,7 @@ const ComboBoxChannelsField = ({
     name="updatesChannel"
     render={({ field }) => (
       <FormItem className="flex flex-col">
-        <FormLabel>Administrator Roles</FormLabel>
+        <FormLabel>Server Channels</FormLabel>
         <Popover>
           <PopoverTrigger asChild>
             <FormControl>
@@ -380,7 +346,7 @@ const ComboBoxChannelsField = ({
                 )}
               >
                 <div className="flex gap-2 flex-wrap">
-                  {field.value.length
+                  {field.value
                     ? values
                         .filter((channel) => field.value === channel.id)
                         .map((channel) => (
@@ -389,7 +355,7 @@ const ComboBoxChannelsField = ({
                             {channel.name}
                           </div>
                         ))
-                    : 'Select a role'}
+                    : 'Select a channel'}
                 </div>
                 <Icons.chevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
