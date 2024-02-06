@@ -7,7 +7,7 @@ import {
 } from 'remix-auth-socials';
 import { fetchUserGuilds } from '~/api/discord.server';
 import { createUser } from '~/api/user.server';
-import { AUTH_URL } from '~/lib/config';
+import { NEXTAUTH_URL } from '~/lib/config';
 import { sessionStorage } from './session.server';
 
 export type DiscordUser = {
@@ -23,7 +23,7 @@ export type DiscordUser = {
 export const authenticator = new Authenticator<DiscordUser>(sessionStorage);
 
 const getCallback = (provider: SocialsProvider) => {
-  return `${AUTH_URL}/auth/${provider}/callback`;
+  return `${NEXTAUTH_URL}/auth/${provider}/callback`;
 };
 
 authenticator.use(

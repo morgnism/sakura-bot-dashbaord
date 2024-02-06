@@ -8,7 +8,8 @@
     "dev": "remix dev --manual",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/index.js",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.3",
@@ -44,6 +45,8 @@
     "@udecode/plate-selection": "^30.1.2",
     "@udecode/plate-serializer-md": "^30.1.2",
     "@udecode/plate-trailing-block": "^30.1.2",
+    "@vercel/analytics": "^1.1.3",
+    "@vercel/remix": "^2.5.1",
     "axios": "^1.6.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
