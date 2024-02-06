@@ -176,9 +176,7 @@ export default function WelcomeChannelPage() {
               </Button>
             </CardContent>
           </Card>
-          <Button disabled={!form.formState.isDirty} type="submit">
-            Save
-          </Button>
+          {form.formState.isDirty && <Button type="submit">Save</Button>}
         </RemixForm>
       </Form>
     </div>
